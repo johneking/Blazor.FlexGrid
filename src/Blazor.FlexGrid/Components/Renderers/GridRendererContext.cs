@@ -18,20 +18,20 @@ namespace Blazor.FlexGrid.Components.Renderers
 {
     public class GridRendererContext : IActualItemContext<object>
     {
-        private string firstColumnName;
-        private string lastColumnName;
-        private readonly IEntityType gridEntityConfiguration;
-        private readonly IReadOnlyDictionary<string, IValueFormatter> valueFormatters;
-        private readonly IReadOnlyDictionary<string, IRenderFragmentAdapter> columnRendererFragments;
-        private readonly IReadOnlyDictionary<string, Func<EditColumnContext, IRenderFragmentAdapter>> columnEditRendererBuilders;
+        private readonly string _firstColumnName;
+        private readonly string _lastColumnName;
+        private readonly IEntityType _gridEntityConfiguration;
+        private readonly IReadOnlyDictionary<string, IValueFormatter> _valueFormatters;
+        private readonly IReadOnlyDictionary<string, IRenderFragmentAdapter> _columnRendererFragments;
+        private readonly IReadOnlyDictionary<string, Func<EditColumnContext, IRenderFragmentAdapter>> _columnEditRendererBuilders;
 
         public string ActualColumnName { get; set; } = string.Empty;
 
         public bool ActualColumnPropertyCanBeEdited { get; set; }
 
-        public bool IsFirstColumn => ActualColumnName.Equals(firstColumnName);
+        public bool IsFirstColumn => ActualColumnName.Equals(_firstColumnName);
 
-        public bool IsLastColumn => ActualColumnName.Equals(lastColumnName);
+        public bool IsLastColumn => ActualColumnName.Equals(_lastColumnName);
 
         public int NumberOfColumns { get; }
 
@@ -41,7 +41,7 @@ namespace Blazor.FlexGrid.Components.Renderers
 
         public object ActualItem { get; set; }
 
-        public IGridViewAnotations GridConfiguration { get; }
+        public IGridViewAnnotations GridConfiguration { get; }
 
         public IReadOnlyCollection<PropertyInfo> GridItemProperties { get; }
 
@@ -49,7 +49,7 @@ namespace Blazor.FlexGrid.Components.Renderers
 
         public ITableDataSet TableDataSet { get; }
 
-        public IGridViewColumnAnotations ActualColumnConfiguration => gridEntityConfiguration.FindColumnConfiguration(ActualColumnName);
+        public IGridViewColumnAnnotations ActualColumnConfiguration => _gridEntityConfiguration.FindColumnConfiguration(ActualColumnName);
 
         public GridCssClasses CssClasses { get; }
 
@@ -62,34 +62,34 @@ namespace Blazor.FlexGrid.Components.Renderers
         public Action RequestRerenderNotification => FlexGridContext.RequestRerenderTableRowsNotification;
 
         public GridRendererContext(
-            ImutableGridRendererContext imutableGridRendererContext,
+            ImmutableGridRendererContext immutableGridRendererContext,
             IRendererTreeBuilder rendererTreeBuilder,
             ITableDataSet tableDataSet,
             FlexGridContext flexGridContext)
         {
-            if (imutableGridRendererContext is null)
+            if (immutableGridRendererContext is null)
             {
-                throw new ArgumentNullException(nameof(imutableGridRendererContext));
+                throw new ArgumentNullException(nameof(immutableGridRendererContext));
             }
 
             RendererTreeBuilder = rendererTreeBuilder ?? throw new ArgumentNullException(nameof(RendererTreeBuilder));
             TableDataSet = tableDataSet ?? throw new ArgumentNullException(nameof(tableDataSet));
             FlexGridContext = flexGridContext ?? throw new ArgumentNullException(nameof(flexGridContext));
 
-            GridConfiguration = imutableGridRendererContext.GridConfiguration;
-            GridItemProperties = imutableGridRendererContext.GridItemProperties;
-            GridItemCollectionProperties = imutableGridRendererContext.GridEntityConfiguration.ClrTypeCollectionProperties;
-            CssClasses = imutableGridRendererContext.CssClasses;
-            PropertyValueAccessor = imutableGridRendererContext.GetPropertyValueAccessor;
+            GridConfiguration = immutableGridRendererContext.GridConfiguration;
+            GridItemProperties = immutableGridRendererContext.GridItemProperties;
+            GridItemCollectionProperties = immutableGridRendererContext.GridEntityConfiguration.ClrTypeCollectionProperties;
+            CssClasses = immutableGridRendererContext.CssClasses;
+            PropertyValueAccessor = immutableGridRendererContext.GetPropertyValueAccessor;
 
-            gridEntityConfiguration = imutableGridRendererContext.GridEntityConfiguration;
-            valueFormatters = imutableGridRendererContext.ValueFormatters;
-            columnRendererFragments = imutableGridRendererContext.ColumnRendererFragments;
-            columnEditRendererBuilders = imutableGridRendererContext.ColumnEditRendererBuilders;
-            firstColumnName = GridItemProperties.First().Name;
-            lastColumnName = GridItemProperties.Last().Name;
+            _gridEntityConfiguration = immutableGridRendererContext.GridEntityConfiguration;
+            _valueFormatters = immutableGridRendererContext.ValueFormatters;
+            _columnRendererFragments = immutableGridRendererContext.ColumnRendererFragments;
+            _columnEditRendererBuilders = immutableGridRendererContext.ColumnEditRendererBuilders;
+            _firstColumnName = GridItemProperties.First().Name;
+            _lastColumnName = GridItemProperties.Last().Name;
             NumberOfColumns = GridItemProperties.Count +
-                (imutableGridRendererContext.InlineEditItemIsAllowed() || imutableGridRendererContext.CreateItemIsAllowed() ? 1 : 0) +
+                (immutableGridRendererContext.InlineEditItemIsAllowed() || immutableGridRendererContext.CreateItemIsAllowed() ? 1 : 0) +
                 (GridConfiguration.IsMasterTable ? 1 : 0);
         }
 
@@ -106,10 +106,10 @@ namespace Blazor.FlexGrid.Components.Renderers
             => RendererTreeBuilder.AddAttribute(HtmlAttributes.Style, style);
 
         public void AddOnClickEvent(EventCallback<MouseEventArgs> onClickBindMethod)
-            => RendererTreeBuilder.AddAttribute(HtmlJSEvents.OnClick, onClickBindMethod);
+            => RendererTreeBuilder.AddAttribute(HtmlJsEvents.OnClick, onClickBindMethod);
 
         public void AddOnChangeEvent(Func<MulticastDelegate> onClickBindMethod)
-            => RendererTreeBuilder.AddAttribute(HtmlJSEvents.OnChange, onClickBindMethod());
+            => RendererTreeBuilder.AddAttribute(HtmlJsEvents.OnChange, onClickBindMethod());
 
         public void AddContent(string content)
             => RendererTreeBuilder.AddContent(content);
@@ -125,14 +125,14 @@ namespace Blazor.FlexGrid.Components.Renderers
                 return;
             }
 
-            if (columnRendererFragments.TryGetValue(ActualColumnName, out var rendererFragmentAdapter))
+            if (_columnRendererFragments.TryGetValue(ActualColumnName, out var rendererFragmentAdapter))
             {
                 var fragment = rendererFragmentAdapter.GetColumnFragment(ActualItem);
                 RendererTreeBuilder.AddContent(fragment);
                 return;
             }
 
-            var valueFormatter = valueFormatters[ActualColumnName];
+            var valueFormatter = _valueFormatters[ActualColumnName];
             var inputForColumnValueFormatter = valueFormatter.FormatterType == ValueFormatterType.SingleProperty
                 ? PropertyValueAccessor.GetValue(ActualItem, ActualColumnName)
                 : ActualItem;
@@ -152,7 +152,7 @@ namespace Blazor.FlexGrid.Components.Renderers
                 return;
             }
 
-            if (columnEditRendererBuilders.TryGetValue(ActualColumnName, out var builder))
+            if (_columnEditRendererBuilders.TryGetValue(ActualColumnName, out var builder))
             {
                 var editColumnContext = new EditColumnContext(ActualColumnName, TableDataSet.EditItemProperty);
                 var rendererFragmentAdapter = builder.Invoke(editColumnContext);
@@ -165,7 +165,8 @@ namespace Blazor.FlexGrid.Components.Renderers
             editInputRendererTree.BuildInputRendererTree(
                 RendererTreeBuilder,
                 this,
-                TableDataSet.EditItemProperty);
+                TableDataSet.EditItemProperty,
+                ActualColumnName);
 
         }
 
@@ -247,7 +248,7 @@ namespace Blazor.FlexGrid.Components.Renderers
             => PropertyValueAccessor.SetValue(ActualItem, columnName, value);
 
         public string GetColumnCaption(string columnName)
-            => gridEntityConfiguration.FindColumnConfiguration(columnName)?.Caption;
+            => _gridEntityConfiguration.FindColumnConfiguration(columnName)?.Caption;
 
         private void AddEventAttributes()
         {

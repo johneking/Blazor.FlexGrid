@@ -11,7 +11,7 @@ namespace Blazor.FlexGrid.Components.Filters
 {
     public class ColumnFilter<TValue> : ComponentBase
     {
-        private static Dictionary<string, ColumnFilterState> stateCache = new Dictionary<string, ColumnFilterState>();
+        private static readonly Dictionary<string, ColumnFilterState> _stateCache = new Dictionary<string, ColumnFilterState>();
 
         private const string WrapperCssClass = "filter-wrapper";
         private const string WrapperCssCheckboxClass = "filter-wrapper-checkbox";
@@ -21,14 +21,14 @@ namespace Blazor.FlexGrid.Components.Filters
             FilterOperation.LessThanOrEqual | FilterOperation.Equal | FilterOperation.NotEqual;
 
         delegate bool Parser(string value, out TValue result);
-        private static Parser parser;
-        private static FilterOperation allowedFilterOperations;
+        private static readonly Parser _parser;
+        private static readonly FilterOperation _allowedFilterOperations;
 
-        private FilterOperation selectedFilterOperation;
-        private TValue actualFilterValue;
-        private bool filterDefinitionOpened = false;
-        private bool filterIsApplied = false;
-        private FilterContext filterContext;
+        private FilterOperation _selectedFilterOperation;
+        private TValue _actualFilterValue;
+        private bool _filterDefinitionOpened;
+        private bool _filterIsApplied;
+        private FilterContext _filterContext;
 
         [CascadingParameter] FlexGridContext CascadeFlexGridContext { get; set; }
 
@@ -40,47 +40,47 @@ namespace Blazor.FlexGrid.Components.Filters
 
             if (targetType == typeof(string))
             {
-                parser = TryParseString;
-                allowedFilterOperations = StringFilterOperations;
+                _parser = TryParseString;
+                _allowedFilterOperations = StringFilterOperations;
             }
             else if (targetType == typeof(int))
             {
-                parser = TryParseInt;
-                allowedFilterOperations = NumberFilterOperations;
+                _parser = TryParseInt;
+                _allowedFilterOperations = NumberFilterOperations;
             }
             else if (targetType == typeof(long))
             {
-                parser = TryParseLong;
-                allowedFilterOperations = NumberFilterOperations;
+                _parser = TryParseLong;
+                _allowedFilterOperations = NumberFilterOperations;
             }
             else if (targetType == typeof(float))
             {
-                parser = TryParseFloat;
-                allowedFilterOperations = NumberFilterOperations;
+                _parser = TryParseFloat;
+                _allowedFilterOperations = NumberFilterOperations;
             }
             else if (targetType == typeof(double))
             {
-                parser = TryParseDouble;
-                allowedFilterOperations = NumberFilterOperations;
+                _parser = TryParseDouble;
+                _allowedFilterOperations = NumberFilterOperations;
             }
             else if (targetType == typeof(decimal))
             {
-                parser = TryParseDecimal;
-                allowedFilterOperations = NumberFilterOperations;
+                _parser = TryParseDecimal;
+                _allowedFilterOperations = NumberFilterOperations;
             }
             else if (targetType == typeof(DateTime))
             {
-                parser = TryParseDateTime;
-                allowedFilterOperations = NumberFilterOperations;
+                _parser = TryParseDateTime;
+                _allowedFilterOperations = NumberFilterOperations;
             }
             else if (targetType == typeof(DateTimeOffset))
             {
-                parser = TryParseDateTimeOffset;
-                allowedFilterOperations = NumberFilterOperations;
+                _parser = TryParseDateTimeOffset;
+                _allowedFilterOperations = NumberFilterOperations;
             }
             else if (targetType == typeof(bool))
             {
-                parser = TryParseBool;
+                _parser = TryParseBool;
             }
             else
             {
@@ -97,11 +97,11 @@ namespace Blazor.FlexGrid.Components.Filters
             var rendererBuilder = new BlazorRendererTreeBuilder(builder);
 
             rendererBuilder
-                .OpenElement(HtmlTagNames.Button, filterIsApplied ? "action-button action-button-small action-button-filter-active" : "action-button action-button-small")
-                .AddAttribute(HtmlJSEvents.OnClick,
+                .OpenElement(HtmlTagNames.Button, _filterIsApplied ? "action-button action-button-small action-button-filter-active" : "action-button action-button-small")
+                .AddAttribute(HtmlJsEvents.OnClick,
                     EventCallback.Factory.Create(this, (MouseEventArgs e) =>
                     {
-                        filterDefinitionOpened = !filterDefinitionOpened;
+                        _filterDefinitionOpened = !_filterDefinitionOpened;
                     })
                  )
                 .OpenElement(HtmlTagNames.Span)
@@ -112,13 +112,13 @@ namespace Blazor.FlexGrid.Components.Filters
 
 
             rendererBuilder.OpenElement(HtmlTagNames.Div,
-                filterDefinitionOpened
-                ? parser != TryParseBool
+                _filterDefinitionOpened
+                ? _parser != TryParseBool
                         ? $"{WrapperCssClass} {WrapperCssClass}-open"
                         : $"{WrapperCssClass} {WrapperCssClass}-open {WrapperCssCheckboxClass}"
                 : $"{WrapperCssClass}");
 
-            if (parser == TryParseBool)
+            if (_parser == TryParseBool)
             {
                 BuildRendererTreeForCheckbox(rendererBuilder);
             }
@@ -128,11 +128,11 @@ namespace Blazor.FlexGrid.Components.Filters
                 BuildRendererTreeForInputs(rendererBuilder);
             }
 
-            if (parser != TryParseBool)
+            if (_parser != TryParseBool)
             {
                 rendererBuilder.OpenElement(HtmlTagNames.Div, "filter-buttons");
                 _ = rendererBuilder.OpenElement(HtmlTagNames.Button, "btn btn-light filter-buttons-clear")
-                    .AddAttribute(HtmlJSEvents.OnClick,
+                    .AddAttribute(HtmlJsEvents.OnClick,
                         EventCallback.Factory.Create(this, (MouseEventArgs e) =>
                         {
                             ClearFilter();
@@ -150,70 +150,70 @@ namespace Blazor.FlexGrid.Components.Filters
         {
             base.OnInitialized();
 
-            filterContext = CascadeFlexGridContext.FilterContext;
+            _filterContext = CascadeFlexGridContext.FilterContext;
         }
 
         private void FilterValueChanged(string value)
         {
-            parser(value, out actualFilterValue);
+            _parser(value, out _actualFilterValue);
             AddFilterDefinition();
-            filterDefinitionOpened = false;
+            _filterDefinitionOpened = false;
         }
 
         private void FilterBoolValueChanged(bool value)
         {
-            actualFilterValue = (TValue)(object)value;
-            selectedFilterOperation = FilterOperation.Equal;
+            _actualFilterValue = (TValue)(object)value;
+            _selectedFilterOperation = FilterOperation.Equal;
             AddFilterDefinition();
         }
 
         private void AddFilterDefinition()
         {
-            filterContext.AddOrUpdateFilterDefinition(new ExpressionFilterDefinition(ColumnName, selectedFilterOperation, actualFilterValue));
-            filterIsApplied = true;
+            _filterContext.AddOrUpdateFilterDefinition(new ExpressionFilterDefinition(ColumnName, _selectedFilterOperation, _actualFilterValue));
+            _filterIsApplied = true;
             CacheActualState();
         }
 
         private void ClearFilter()
         {
-            filterContext.RemoveFilter(ColumnName);
-            filterIsApplied = false;
-            filterDefinitionOpened = false;
-            stateCache.Remove(ColumnName);
+            _filterContext.RemoveFilter(ColumnName);
+            _filterIsApplied = false;
+            _filterDefinitionOpened = false;
+            _stateCache.Remove(ColumnName);
         }
 
         private void LoadStateIfExists()
         {
-            if (stateCache.TryGetValue(ColumnName, out var columnFilterState))
+            if (_stateCache.TryGetValue(ColumnName, out var columnFilterState))
             {
-                selectedFilterOperation = columnFilterState.FilterOperation;
-                actualFilterValue = (TValue)columnFilterState.FilterValue;
-                filterIsApplied = true;
+                _selectedFilterOperation = columnFilterState.FilterOperation;
+                _actualFilterValue = (TValue)columnFilterState.FilterValue;
+                _filterIsApplied = true;
             }
         }
 
         private void CacheActualState()
         {
-            var filterState = new ColumnFilterState(actualFilterValue, selectedFilterOperation);
-            if (!stateCache.ContainsKey(ColumnName))
+            var filterState = new ColumnFilterState(_actualFilterValue, _selectedFilterOperation);
+            if (!_stateCache.ContainsKey(ColumnName))
             {
-                stateCache.Add(ColumnName, filterState);
+                _stateCache.Add(ColumnName, filterState);
             }
             else
             {
-                stateCache[ColumnName] = filterState;
+                _stateCache[ColumnName] = filterState;
             }
         }
 
         private void BuildRendererTreeForInputs(BlazorRendererTreeBuilder rendererBuilder)
         {
-            if (parser == TryParseDateTime || parser == TryParseDateTimeOffset)
+            if (_parser == TryParseDateTime || _parser == TryParseDateTimeOffset)
             {
                 _ = rendererBuilder
                     .OpenElement(HtmlTagNames.Input, "edit-text-field edit-date-field-filter")
                     .AddAttribute(HtmlAttributes.Type, HtmlAttributes.TypeDate)
-                    .AddAttribute(HtmlAttributes.Value, FormatDateAsString(actualFilterValue))
-                    .AddAttribute(HtmlJSEvents.OnChange, EventCallback.Factory.Create(this,
+                    .AddAttribute(HtmlAttributes.Value, FormatDateAsString(_actualFilterValue))
+                    .AddAttribute(HtmlJsEvents.OnChange, EventCallback.Factory.Create(this,
                         (ChangeEventArgs e) =>
                         {
                             FilterValueChanged(BindConverterExtensions.ConvertTo(e.Value, string.Empty));
@@ -225,8 +225,8 @@ namespace Blazor.FlexGrid.Components.Filters
 
             rendererBuilder
                 .OpenElement(HtmlTagNames.Input, "edit-text-field edit-text-field-filter")
-                .AddAttribute(HtmlAttributes.Value, filterIsApplied ? actualFilterValue.ToString() : string.Empty)
-                .AddAttribute(HtmlJSEvents.OnChange, EventCallback.Factory.Create(this,
+                .AddAttribute(HtmlAttributes.Value, _filterIsApplied ? _actualFilterValue.ToString() : string.Empty)
+                .AddAttribute(HtmlJsEvents.OnChange, EventCallback.Factory.Create(this,
                     (ChangeEventArgs e) =>
                     {
                         FilterValueChanged(BindConverterExtensions.ConvertTo(e.Value, string.Empty));
@@ -240,8 +240,8 @@ namespace Blazor.FlexGrid.Components.Filters
                 .OpenElement(HtmlTagNames.Label, "switch")
                 .OpenElement(HtmlTagNames.Input)
                 .AddAttribute(HtmlAttributes.Type, HtmlAttributes.Checkbox)
-                .AddAttribute(HtmlAttributes.Value, actualFilterValue)
-                .AddAttribute(HtmlJSEvents.OnChange, EventCallback.Factory.Create(this,
+                .AddAttribute(HtmlAttributes.Value, _actualFilterValue)
+                .AddAttribute(HtmlJsEvents.OnChange, EventCallback.Factory.Create(this,
                     (ChangeEventArgs e) =>
                     {
                         FilterBoolValueChanged(BindConverterExtensions.ConvertTo(e.Value, false));
@@ -256,13 +256,13 @@ namespace Blazor.FlexGrid.Components.Filters
         {
             rendererBuilder
                     .OpenElement(HtmlTagNames.Select)
-                    .AddAttribute(HtmlJSEvents.OnChange, EventCallback.Factory.Create(this,
+                    .AddAttribute(HtmlJsEvents.OnChange, EventCallback.Factory.Create(this,
                         (ChangeEventArgs e) =>
                         {
-                            selectedFilterOperation = (FilterOperation)BindConverterExtensions.ConvertTo(e.Value, 1);
-                            if (filterIsApplied)
+                            _selectedFilterOperation = (FilterOperation)BindConverterExtensions.ConvertTo(e.Value, 1);
+                            if (_filterIsApplied)
                             {
-                                filterContext.AddOrUpdateFilterDefinition(new ExpressionFilterDefinition(ColumnName, selectedFilterOperation, actualFilterValue));
+                                _filterContext.AddOrUpdateFilterDefinition(new ExpressionFilterDefinition(ColumnName, _selectedFilterOperation, _actualFilterValue));
                             }
 
                         }));
@@ -271,19 +271,19 @@ namespace Blazor.FlexGrid.Components.Filters
             {
                 var filterOperation = (FilterOperation)enumValue;
 
-                if (!allowedFilterOperations.HasFlag(filterOperation)
+                if (!_allowedFilterOperations.HasFlag(filterOperation)
                     || filterOperation == FilterOperation.None)
                 {
                     continue;
                 }
 
-                selectedFilterOperation = selectedFilterOperation == FilterOperation.None
+                _selectedFilterOperation = _selectedFilterOperation == FilterOperation.None
                     ? filterOperation
-                    : selectedFilterOperation;
+                    : _selectedFilterOperation;
 
                 var enumStringValue = enumValue.ToString();
                 rendererBuilder.OpenElement(HtmlTagNames.Option);
-                if (enumStringValue == selectedFilterOperation.ToString())
+                if (enumStringValue == _selectedFilterOperation.ToString())
                 {
                     rendererBuilder.AddAttribute(HtmlAttributes.Selected, true);
                 }

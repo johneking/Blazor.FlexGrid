@@ -14,10 +14,10 @@ namespace Blazor.FlexGrid.Components
         where TModel : class
         where TOutputDto : class
     {
-        private ICreateItemFormViewModel<TModel> createItemFormViewModel;
+        private ICreateItemFormViewModel<TModel> _createItemFormViewModel;
 
         [Inject]
-        private CreateItemFormRenderer<TModel> CreatetemFormRenderer { get; set; }
+        private CreateItemFormRenderer<TModel> CreateItemFormRenderer { get; set; }
 
         [Inject]
         private ITypePropertyAccessorCache PropertyValueAccessorCache { get; set; }
@@ -31,24 +31,27 @@ namespace Blazor.FlexGrid.Components
         [Inject]
         private FlexGridInterop FlexGridInterop { get; set; }
 
+		[Inject]
+		private IGridConfigurationProvider ConfigurationProvider { get; set; }
+
         [Parameter] public CreateItemContext CreateItemContext { get; set; }
 
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
             base.BuildRenderTree(builder);
-
-            CreatetemFormRenderer.BuildRendererTree(
-                LayoutProvider.GetLayoutBuilder() ?? new SignleColumnLayout<TModel>(),
-                new CreateItemRendererContext<TModel>(createItemFormViewModel, PropertyValueAccessorCache, CreateItemContext.CreateFormCssClasses),
+            var config = ConfigurationProvider.FindGridEntityConfigurationByType(typeof(TModel));
+            CreateItemFormRenderer.BuildRendererTree(
+                LayoutProvider.GetLayoutBuilder() ?? new SingleColumnLayout<TModel>(),
+                new CreateItemRendererContext<TModel>(_createItemFormViewModel, PropertyValueAccessorCache, CreateItemContext.CreateFormCssClasses, config),
                 new BlazorRendererTreeBuilder(builder));
         }
 
         protected override void OnParametersSet()
         {
-            if (createItemFormViewModel is null)
+            if (_createItemFormViewModel is null)
             {
-                createItemFormViewModel = new CreateItemFormViewModel<TModel>(CreateItemContext.CreateItemOptions);
-                createItemFormViewModel.SaveAction = async model =>
+                _createItemFormViewModel = new CreateItemFormViewModel<TModel>(CreateItemContext.CreateItemOptions);
+                _createItemFormViewModel.SaveAction = async model =>
                 {
                     if (string.IsNullOrEmpty(CreateItemContext.CreateItemOptions.CreateUri))
                     {
@@ -59,7 +62,7 @@ namespace Blazor.FlexGrid.Components
                         var dto = await CreateItemHandle.CreateItem(model, CreateItemContext.CreateItemOptions, CancellationToken.None);
                         CreateItemContext.NotifyItemCreated(dto);
                     }
-                    createItemFormViewModel.ClearModel();
+                    _createItemFormViewModel.ClearModel();
 
                     if (CreateItemContext.CreateItemOptions.CloseAfterSuccessfullySaved)
                     {

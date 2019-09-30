@@ -7,9 +7,9 @@ namespace Blazor.FlexGrid.DataAdapters
 {
     internal class DetailTableDataAdapter<TItem> : BaseTableDataAdapter where TItem : class
     {
-        private readonly IGridConfigurationProvider gridConfigurationProvider;
-        private readonly IDetailDataAdapterVisitors detailDataAdapterVisitors;
-        private readonly IMasterDetailRowArguments masterDetailRowArguments;
+        private readonly IGridConfigurationProvider _gridConfigurationProvider;
+        private readonly IDetailDataAdapterVisitors _detailDataAdapterVisitors;
+        private readonly IMasterDetailRowArguments _masterDetailRowArguments;
 
         public override Type UnderlyingTypeOfItem => typeof(TItem);
 
@@ -18,24 +18,24 @@ namespace Blazor.FlexGrid.DataAdapters
             IDetailDataAdapterVisitors detailDataAdapterVisitors,
             IMasterDetailRowArguments masterDetailRowArguments)
         {
-            this.gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
-            this.detailDataAdapterVisitors = detailDataAdapterVisitors ?? throw new ArgumentNullException(nameof(detailDataAdapterVisitors));
-            this.masterDetailRowArguments = masterDetailRowArguments ?? throw new ArgumentNullException(nameof(masterDetailRowArguments));
+            _gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
+            _detailDataAdapterVisitors = detailDataAdapterVisitors ?? throw new ArgumentNullException(nameof(detailDataAdapterVisitors));
+            _masterDetailRowArguments = masterDetailRowArguments ?? throw new ArgumentNullException(nameof(masterDetailRowArguments));
         }
 
         public override ITableDataSet GetTableDataSet(Action<TableDataSetOptions> configureDataSet)
         {
-            var masterDetailRelation = gridConfigurationProvider
-                .GetGridConfigurationByType(masterDetailRowArguments.SelectedItem.GetType())
+            var masterDetailRelation = _gridConfigurationProvider
+                .GetGridConfigurationByType(_masterDetailRowArguments.SelectedItem.GetType())
                 .FindRelationshipConfiguration(UnderlyingTypeOfItem);
 
             if (masterDetailRelation.IsOwnCollection)
             {
-                return masterDetailRowArguments.DataAdapter.GetTableDataSet(configureDataSet);
+                return _masterDetailRowArguments.DataAdapter.GetTableDataSet(configureDataSet);
             }
 
-            var clonedDataAdapter = masterDetailRowArguments.DataAdapter.Clone() as ITableDataAdapter;
-            foreach (var visitor in detailDataAdapterVisitors.GetVisitors(masterDetailRowArguments))
+            var clonedDataAdapter = _masterDetailRowArguments.DataAdapter.Clone() as ITableDataAdapter;
+            foreach (var visitor in _detailDataAdapterVisitors.GetVisitors(_masterDetailRowArguments))
             {
                 clonedDataAdapter.Accept(visitor);
             }
@@ -44,6 +44,6 @@ namespace Blazor.FlexGrid.DataAdapters
         }
 
         public override object Clone()
-            => new DetailTableDataAdapter<TItem>(gridConfigurationProvider, detailDataAdapterVisitors, masterDetailRowArguments);
+            => new DetailTableDataAdapter<TItem>(_gridConfigurationProvider, _detailDataAdapterVisitors, _masterDetailRowArguments);
     }
 }

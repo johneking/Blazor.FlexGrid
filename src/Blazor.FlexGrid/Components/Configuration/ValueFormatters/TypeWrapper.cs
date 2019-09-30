@@ -8,26 +8,26 @@ namespace Blazor.FlexGrid.Components.Configuration.ValueFormatters
 {
     public class TypeWrapper : ITypePropertyAccessor
     {
-        private readonly Dictionary<string, Func<object, object>> getters
+        private readonly Dictionary<string, Func<object, object>> _getters
             = new Dictionary<string, Func<object, object>>();
 
-        private readonly Dictionary<string, Action<object, object>> setters
+        private readonly Dictionary<string, Action<object, object>> _setters
             = new Dictionary<string, Action<object, object>>();
 
-        private readonly List<PropertyInfo> properties;
+        private readonly List<PropertyInfo> _properties;
 
-        private readonly ILogger logger;
+        private readonly ILogger _logger;
 
-        public IEnumerable<PropertyInfo> Properties => properties;
+        public IEnumerable<PropertyInfo> Properties => _properties;
 
-
+		
         public TypeWrapper(Type clrType, ILogger logger)
         {
-            properties = new List<PropertyInfo>();
+            _properties = new List<PropertyInfo>();
 
             foreach (var property in clrType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                properties.Add(property);
+                _properties.Add(property);
 
                 var wrappedObjectParameter = Expression.Parameter(typeof(object));
                 var valueParameter = Expression.Parameter(typeof(object));
@@ -39,7 +39,7 @@ namespace Blazor.FlexGrid.Components.Configuration.ValueFormatters
                         typeof(object)),
                     wrappedObjectParameter);
 
-                this.getters.Add(property.Name, getExpression.Compile());
+                _getters.Add(property.Name, getExpression.Compile());
 
                 if (property.CanWrite)
                 {
@@ -51,23 +51,23 @@ namespace Blazor.FlexGrid.Components.Configuration.ValueFormatters
                              Expression.Convert(valueParameter, property.PropertyType)),
                          wrappedObjectParameter, valueParameter);
 
-                    this.setters.Add(property.Name, setExpression.Compile());
+                    _setters.Add(property.Name, setExpression.Compile());
                 }
             }
 
-            this.logger = logger;
+            _logger = logger;
         }
 
         public object GetValue(object @object, string name)
         {
             try
             {
-                var get = getters[name];
+                var get = _getters[name];
                 return get(@object);
             }
             catch (Exception ex)
             {
-                logger.LogError($"TypeWrapper:GetValue. Ex: {ex}");
+                _logger.LogError($"TypeWrapper:GetValue. Ex: {ex}");
 
                 throw;
             }
@@ -77,13 +77,13 @@ namespace Blazor.FlexGrid.Components.Configuration.ValueFormatters
         {
             try
             {
-                var set = setters[propertyName];
+                var set = _setters[propertyName];
                 set(instance, value);
             }
 
             catch (Exception ex)
             {
-                logger.LogError($"TypeWrapper:SetValue. Ex: {ex}");
+                _logger.LogError($"TypeWrapper:SetValue. Ex: {ex}");
 
                 throw;
             }

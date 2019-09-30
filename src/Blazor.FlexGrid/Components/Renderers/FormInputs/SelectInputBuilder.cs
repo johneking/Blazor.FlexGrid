@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Rendering;
-using Microsoft.AspNetCore.Components.RenderTree;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -11,20 +10,19 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
 {
     public class SelectInputBuilder : IFormInputRendererBuilder
     {
-        private static Dictionary<Type, SelectInputContext> selectInputContexts = new Dictionary<Type, SelectInputContext>();
+        private static readonly Dictionary<Type, SelectInputContext> SelectInputContexts = new Dictionary<Type, SelectInputContext>();
 
-        private readonly MethodInfo callbackMethodBuilderMethodInfo;
-        private readonly MethodInfo valueChangedMethodInfo;
+        private readonly MethodInfo _callbackMethodBuilderMethodInfo;
+        private readonly MethodInfo _valueChangedMethodInfo;
 
         public SelectInputBuilder()
         {
-            callbackMethodBuilderMethodInfo = typeof(RefelctionHelper).GetMethod(nameof(RefelctionHelper.CreateEventCallback));
-            valueChangedMethodInfo = typeof(SelectInputBuilder).GetMethod(nameof(SelectInputBuilder.ValueChanged));
+            _callbackMethodBuilderMethodInfo = typeof(ReflectionHelper).GetMethod(nameof(ReflectionHelper.CreateEventCallback));
+            _valueChangedMethodInfo = typeof(SelectInputBuilder).GetMethod(nameof(ValueChanged));
         }
 
-        public Action<IRendererTreeBuilder> BuildRendererTree<TItem>(IActualItemContext<TItem> actualItemContext, FormField field) where TItem : class
+        public Action<IRendererTreeBuilder> BuildRendererTree<TItem>(IActualItemContext<TItem> actualItemContext, FormField field, string localColumnName) where TItem : class
         {
-            var localColumnName = actualItemContext.ActualColumnName;
             var localValue = actualItemContext.GetActualItemColumnValue(localColumnName);
 
             var valueExpression = Expression.Lambda(Expression.Property(Expression.Constant(actualItemContext.ActualItem), field.Info));
@@ -37,7 +35,7 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
             {
                 builder
                     .OpenElement(HtmlTagNames.Div, "form-field-wrapper")
-                    .OpenComponent(typeof(InputSelect<>).MakeGenericType(field.UnderlyneType))
+                    .OpenComponent(typeof(InputSelect<>).MakeGenericType(field.UnderlyingType))
                     .AddAttribute("id", $"create-form-{localColumnName}")
                     .AddAttribute("class", "edit-text-field")
                     .AddAttribute("Value", localValue)
@@ -45,7 +43,7 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
                     .AddAttribute(BlazorRendererTreeBuilder.ChildContent, optionsFragment)
                     .AddAttribute("ValueChanged", valueChanged)
                     .CloseComponent()
-                    .OpenComponent(typeof(ValidationMessage<>).MakeGenericType(field.UnderlyneType))
+                    .OpenComponent(typeof(ValidationMessage<>).MakeGenericType(field.UnderlyingType))
                     .AddAttribute("For", valueExpression)
                     .CloseComponent()
                     .CloseElement();
@@ -58,7 +56,7 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
 
         public static void ValueChanged<T>(T value)
         {
-            if (selectInputContexts.TryGetValue(value.GetType(), out var context))
+            if (SelectInputContexts.TryGetValue(value.GetType(), out var context))
             {
                 context.ValueChangedAction.Invoke(value);
             }
@@ -67,7 +65,7 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
         private void InitializeSelectInputContext<TItem>(IActualItemContext<TItem> actualItemContext, PropertyInfo field, string localColumnName)
             where TItem : class
         {
-            if (selectInputContexts.TryGetValue(field.PropertyType, out var context))
+            if (SelectInputContexts.TryGetValue(field.PropertyType, out var context))
             {
                 context.SetValueChangedAction(value =>
                     actualItemContext.SetActualItemColumnValue(localColumnName, Enum.Parse(field.PropertyType, value.ToString()))
@@ -80,7 +78,7 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
                     actualItemContext.SetActualItemColumnValue(localColumnName, Enum.Parse(field.PropertyType, value.ToString()))
                 );
 
-                selectInputContexts.Add(field.PropertyType, newContext);
+                SelectInputContexts.Add(field.PropertyType, newContext);
             }
         }
 
@@ -113,9 +111,9 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
 
         private object CreateValueChangedCallback(PropertyInfo field)
         {
-            var callbackMethodBuilder = callbackMethodBuilderMethodInfo.MakeGenericMethod(field.PropertyType);
+            var callbackMethodBuilder = _callbackMethodBuilderMethodInfo.MakeGenericMethod(field.PropertyType);
             var actionType = typeof(Action<>).MakeGenericType(field.PropertyType);
-            var typedValueChangeMethod = valueChangedMethodInfo.MakeGenericMethod(field.PropertyType);
+            var typedValueChangeMethod = _valueChangedMethodInfo.MakeGenericMethod(field.PropertyType);
             var @delegate = Delegate.CreateDelegate(actionType, typedValueChangeMethod);
             var valueChanged = callbackMethodBuilder.Invoke(null, new object[] { this, @delegate });
 

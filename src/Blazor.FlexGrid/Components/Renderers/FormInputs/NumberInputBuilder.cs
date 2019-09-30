@@ -1,22 +1,23 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace Blazor.FlexGrid.Components.Renderers.FormInputs
 {
     public class NumberInputBuilder : IFormInputRendererBuilder
     {
-        private readonly EventCallbackFactory eventCallbackFactory;
+        private readonly EventCallbackFactory _eventCallbackFactory;
 
         public NumberInputBuilder()
         {
-            this.eventCallbackFactory = new EventCallbackFactory();
+            _eventCallbackFactory = new EventCallbackFactory();
         }
 
-        public Action<IRendererTreeBuilder> BuildRendererTree<TItem>(IActualItemContext<TItem> actualItemContext, FormField field) where TItem : class
+        public Action<IRendererTreeBuilder> BuildRendererTree<TItem>(IActualItemContext<TItem> actualItemContext, FormField field, string localColumnName) where TItem : class
         {
-            var localColumnName = actualItemContext.ActualColumnName;
             var value = actualItemContext.GetActualItemColumnValue(localColumnName);
 
             var valueExpression = GetValueExpression(actualItemContext.ActualItem, field);
@@ -31,90 +32,90 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
                     .AddAttribute("Value", value)
                     .AddAttribute("ValueExpression", valueExpression);
 
-                if (field.UnderlyneType == typeof(int))
+                if (field.UnderlyingType == typeof(int))
                 {
                     if (field.IsNullable)
                     {
                         builder
-                          .AddAttribute("ValueChanged", eventCallbackFactory.Create<int?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                          .AddAttribute("ValueChanged", _eventCallbackFactory.Create<int?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
                           .CloseComponent()
                           .AddValidationMessage<int?>(valueExpression);
                     }
                     else
                     {
                         builder
-                            .AddAttribute("ValueChanged", eventCallbackFactory.Create<int>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                            .AddAttribute("ValueChanged", _eventCallbackFactory.Create<int>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
                             .CloseComponent()
                             .AddValidationMessage<int>(valueExpression);
                     }
 
                 }
-                else if (field.UnderlyneType == typeof(long))
+                else if (field.UnderlyingType == typeof(long))
                 {
                     if (field.IsNullable)
                     {
                         builder
-                            .AddAttribute("ValueChanged", eventCallbackFactory.Create<long?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                            .AddAttribute("ValueChanged", _eventCallbackFactory.Create<long?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
                             .CloseComponent()
                             .AddValidationMessage<long?>(valueExpression);
                     }
                     else
                     {
                         builder
-                           .AddAttribute("ValueChanged", eventCallbackFactory.Create<long>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                           .AddAttribute("ValueChanged", _eventCallbackFactory.Create<long>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
                            .CloseComponent()
                            .AddValidationMessage<long>(valueExpression);
                     }
 
                 }
-                else if (field.UnderlyneType == typeof(decimal))
+                else if (field.UnderlyingType == typeof(decimal))
                 {
                     if (field.IsNullable)
                     {
                         builder
-                        .AddAttribute("ValueChanged", eventCallbackFactory.Create<decimal?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                        .AddAttribute("ValueChanged", _eventCallbackFactory.Create<decimal?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
                         .CloseComponent()
                         .AddValidationMessage<decimal?>(valueExpression);
                     }
                     else
                     {
                         builder
-                            .AddAttribute("ValueChanged", eventCallbackFactory.Create<decimal>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                            .AddAttribute("ValueChanged", _eventCallbackFactory.Create<decimal>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
                             .CloseComponent()
                             .AddValidationMessage<decimal>(valueExpression);
                     }
                 }
-                else if (field.UnderlyneType == typeof(double))
+                else if (field.UnderlyingType == typeof(double))
                 {
                     if (field.IsNullable)
                     {
                         builder
-                            .AddAttribute("ValueChanged", eventCallbackFactory.Create<double?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                            .AddAttribute("ValueChanged", _eventCallbackFactory.Create<double?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
                             .CloseComponent()
                             .AddValidationMessage<double?>(valueExpression);
                     }
                     else
                     {
                         builder
-                            .AddAttribute("ValueChanged", eventCallbackFactory.Create<double>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                            .AddAttribute("ValueChanged", _eventCallbackFactory.Create<double>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
                             .CloseComponent()
                             .AddValidationMessage<double>(valueExpression);
                     }
 
                 }
-                else if (field.UnderlyneType == typeof(float))
+                else if (field.UnderlyingType == typeof(float))
                 {
                     if (field.IsNullable)
                     {
                         builder
-                            .AddAttribute("ValueChanged", eventCallbackFactory.Create<float?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                            .AddAttribute("ValueChanged", _eventCallbackFactory.Create<float?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
                             .CloseComponent()
                             .AddValidationMessage<float?>(valueExpression);
                     }
                     else
                     {
                         builder
-                            .AddAttribute("ValueChanged", eventCallbackFactory.Create<float>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                            .AddAttribute("ValueChanged", _eventCallbackFactory.Create<float>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
                             .CloseComponent()
                             .AddValidationMessage<float>(valueExpression);
                     }
@@ -126,11 +127,12 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
         }
 
         public bool IsSupportedDateType(Type type)
-            => type == typeof(int) || type == typeof(long) || type == typeof(decimal) || type == typeof(double) || type == typeof(float);
+	        => SupportedTypes.Contains(type);
 
+        private static readonly Type[] SupportedTypes = { typeof(int), typeof(long), typeof(decimal), typeof(double), typeof(float) };
         private LambdaExpression GetValueExpression(object actualItem, FormField field)
         {
-            if (field.UnderlyneType == typeof(int))
+            if (field.UnderlyingType == typeof(int))
             {
                 if (field.IsNullable)
                 {
@@ -148,7 +150,7 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
                             field.Info));
                 }
             }
-            else if (field.UnderlyneType == typeof(long))
+            else if (field.UnderlyingType == typeof(long))
             {
                 if (field.IsNullable)
                 {
@@ -165,7 +167,7 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
                             field.Info));
                 }
             }
-            else if (field.UnderlyneType == typeof(decimal))
+            else if (field.UnderlyingType == typeof(decimal))
             {
                 if (field.IsNullable)
                 {
@@ -182,7 +184,7 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
                             field.Info));
                 }
             }
-            else if (field.UnderlyneType == typeof(double))
+            else if (field.UnderlyingType == typeof(double))
             {
                 if (field.IsNullable)
                 {
@@ -199,7 +201,7 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
                             field.Info));
                 }
             }
-            else if (field.UnderlyneType == typeof(float))
+            else if (field.UnderlyingType == typeof(float))
             {
                 if (field.IsNullable)
                 {
@@ -217,7 +219,7 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
                 }
             }
 
-            throw new ArgumentException($"{nameof(NumberInputBuilder)} does not support type {field.UnderlyneType}");
+            throw new ArgumentException($"{nameof(NumberInputBuilder)} does not support type {field.UnderlyingType}");
         }
     }
 }

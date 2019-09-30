@@ -5,20 +5,20 @@ using System;
 
 namespace Blazor.FlexGrid.Components.Configuration.MetaData
 {
-    public class GridColumnAnotations : IGridViewColumnAnotations
+	public class GridColumnAnnotations : IGridViewColumnAnnotations
     {
         public const int DefaultOrder = 5000;
 
-        private readonly IProperty propertyMetadata;
+        private readonly IProperty _propertyMetadata;
 
         public string Caption
         {
             get
             {
                 var captionAnnotationValue = Annotations[GridViewAnnotationNames.ColumnCaption];
-                if (captionAnnotationValue is NullAnotationValue)
+                if (captionAnnotationValue is NullAnnotationValue)
                 {
-                    return propertyMetadata.Name;
+                    return _propertyMetadata.Name;
                 }
 
                 return captionAnnotationValue.ToString();
@@ -30,7 +30,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             get
             {
                 var captionAnnotationValue = Annotations[GridViewAnnotationNames.ColumnHeaderStyle];
-                if (captionAnnotationValue is NullAnotationValue)
+                if (captionAnnotationValue is NullAnnotationValue)
                 {
                     return string.Empty;
                 }
@@ -44,7 +44,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             get
             {
                 var orderAnnotationValue = Annotations[GridViewAnnotationNames.ColumnOrder];
-                if (orderAnnotationValue is NullAnotationValue)
+                if (orderAnnotationValue is NullAnnotationValue)
                 {
                     return DefaultOrder;
                 }
@@ -58,7 +58,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             get
             {
                 var orderAnnotationValue = Annotations[GridViewAnnotationNames.ColumnIsVisible];
-                if (orderAnnotationValue is NullAnotationValue)
+                if (orderAnnotationValue is NullAnnotationValue)
                 {
                     return true;
                 }
@@ -72,7 +72,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             get
             {
                 var sortAnnotationValue = Annotations[GridViewAnnotationNames.ColumnIsSortable];
-                if (sortAnnotationValue is NullAnotationValue)
+                if (sortAnnotationValue is NullAnnotationValue)
                 {
                     return false;
                 }
@@ -86,7 +86,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             get
             {
                 var filterAnnotationValue = Annotations[GridViewAnnotationNames.ColumnIsFilterable];
-                if (filterAnnotationValue is NullAnotationValue)
+                if (filterAnnotationValue is NullAnnotationValue)
                 {
                     return false;
                 }
@@ -101,7 +101,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             get
             {
                 var formatterValueAnnotation = Annotations[GridViewAnnotationNames.ColumnValueFormatter];
-                if (formatterValueAnnotation is NullAnotationValue)
+                if (formatterValueAnnotation is NullAnnotationValue)
                 {
                     return new DefaultValueFormatter();
                 }
@@ -115,7 +115,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             get
             {
                 var specialColumnValue = Annotations[GridViewAnnotationNames.ColumnValueBlazorComponent];
-                if (specialColumnValue is NullAnotationValue)
+                if (specialColumnValue is NullAnnotationValue)
                 {
                     return null;
                 }
@@ -129,7 +129,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             get
             {
                 var edcitComponentFragmentBuilder = Annotations[GridViewAnnotationNames.ColumnEditBlazorComponentBuilder];
-                if (edcitComponentFragmentBuilder is NullAnotationValue)
+                if (edcitComponentFragmentBuilder is NullAnnotationValue)
                 {
                     return null;
                 }
@@ -143,7 +143,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             get
             {
                 var hasPermissionFunc = Annotations[GridViewAnnotationNames.ColumnReadPermission];
-                if (hasPermissionFunc is NullAnotationValue)
+                if (hasPermissionFunc is NullAnnotationValue)
                 {
                     return p => true;
                 }
@@ -156,8 +156,8 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
         {
             get
             {
-                var hasPermissionFunc = Annotations[GridViewAnnotationNames.ColumnWrtiePermission];
-                if (hasPermissionFunc is NullAnotationValue)
+                var hasPermissionFunc = Annotations[GridViewAnnotationNames.ColumnWritePermission];
+                if (hasPermissionFunc is NullAnnotationValue)
                 {
                     return p => true;
                 }
@@ -168,10 +168,10 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
 
         protected IAnnotatable Annotations { get; }
 
-        public GridColumnAnotations(IProperty property)
+        public GridColumnAnnotations(IProperty property)
         {
             Annotations = property ?? throw new ArgumentNullException(nameof(property));
-            this.propertyMetadata = property;
+            _propertyMetadata = property;
         }
     }
 }

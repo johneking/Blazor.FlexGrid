@@ -7,7 +7,7 @@ namespace Blazor.FlexGrid.Components.Configuration
 {
     public static class MetadataExtensions
     {
-        public static IGridViewColumnAnotations FindColumnConfiguration(this IEntityType entityType, string columnName)
+        public static IGridViewColumnAnnotations FindColumnConfiguration(this IEntityType entityType, string columnName)
         {
             var property = entityType.FindProperty(columnName);
             if (property is null)
@@ -15,13 +15,13 @@ namespace Blazor.FlexGrid.Components.Configuration
                 return null;
             }
 
-            return new GridColumnAnotations(property);
+            return new GridColumnAnnotations(property);
         }
 
         public static bool IsConfiguredAsMasterTable(this IEntityType entityType)
         {
             var masterTableAnnotationValue = entityType[GridViewAnnotationNames.IsMasterTable];
-            if (masterTableAnnotationValue is NullAnotationValue)
+            if (masterTableAnnotationValue is NullAnnotationValue)
             {
                 return false;
             }
@@ -37,7 +37,7 @@ namespace Blazor.FlexGrid.Components.Configuration
             }
 
             var pageSizeAnnotationValue = masterDetailRelationship[GridViewAnnotationNames.DetailTabPageSize];
-            if (pageSizeAnnotationValue is NullAnotationValue)
+            if (pageSizeAnnotationValue is NullAnnotationValue)
             {
                 return masterTableDataSet.PageableOptions.PageSize;
             }
@@ -53,7 +53,7 @@ namespace Blazor.FlexGrid.Components.Configuration
             }
 
             var tabCaptionAnnotationValue = masterDetailRelationship[GridViewAnnotationNames.DetailTabPageCaption];
-            if (tabCaptionAnnotationValue is NullAnotationValue)
+            if (tabCaptionAnnotationValue is NullAnnotationValue)
             {
                 return tableDataAdapter.DefaultTitle();
             }
@@ -64,7 +64,7 @@ namespace Blazor.FlexGrid.Components.Configuration
         public static string DetailGridLazyLoadingUrl(this IMasterDetailRelationship masterDetailRelationship)
         {
             var lazyLoadingUrl = masterDetailRelationship[GridViewAnnotationNames.DetailLazyLoadingUrl];
-            if (lazyLoadingUrl is NullAnotationValue)
+            if (lazyLoadingUrl is NullAnnotationValue)
             {
                 return string.Empty;
             }
@@ -75,7 +75,7 @@ namespace Blazor.FlexGrid.Components.Configuration
         public static string DetailGridUpdateUrl(this IMasterDetailRelationship masterDetailRelationship)
         {
             var updateUrl = masterDetailRelationship[GridViewAnnotationNames.DetailUpdateUrl];
-            if (updateUrl is NullAnotationValue)
+            if (updateUrl is NullAnnotationValue)
             {
                 return string.Empty;
             }
@@ -86,7 +86,7 @@ namespace Blazor.FlexGrid.Components.Configuration
         public static string DetailGridDeleteUrl(this IMasterDetailRelationship masterDetailRelationship)
         {
             var deleteUrl = masterDetailRelationship[GridViewAnnotationNames.DetailDeleteUrl];
-            if (deleteUrl is NullAnotationValue)
+            if (deleteUrl is NullAnnotationValue)
             {
                 return string.Empty;
             }

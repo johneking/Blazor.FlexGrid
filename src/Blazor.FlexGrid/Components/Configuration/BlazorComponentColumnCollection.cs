@@ -8,13 +8,13 @@ namespace Blazor.FlexGrid.Components.Configuration
 {
     public class BlazorComponentColumnCollection<TItem> : ISpecialColumnFragmentsCollection<TItem>
     {
-        private readonly InternalModelBuilder internalModelBuilder;
-        private readonly IGridConfigurationProvider gridConfigurationProvider;
+        private readonly InternalModelBuilder _internalModelBuilder;
+        private readonly IGridConfigurationProvider _gridConfigurationProvider;
 
         public BlazorComponentColumnCollection(IGridConfigurationProvider gridConfigurationProvider)
         {
-            this.gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
-            this.internalModelBuilder = new InternalModelBuilder(gridConfigurationProvider.ConfigurationModel as Model);
+            _gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
+            _internalModelBuilder = new InternalModelBuilder(gridConfigurationProvider.ConfigurationModel as Model);
         }
 
         public ISpecialColumnFragmentsCollection<TItem> AddColumnValueRenderFunction<TColumn>(
@@ -39,10 +39,10 @@ namespace Blazor.FlexGrid.Components.Configuration
 
         private InternalPropertyBuilder GetPropertyBuilder<TColumn>(Expression<Func<TItem, TColumn>> columnExpression)
         {
-            var entityType = gridConfigurationProvider.FindGridEntityConfigurationByType(typeof(TItem));
+            var entityType = _gridConfigurationProvider.FindGridEntityConfigurationByType(typeof(TItem));
             if (entityType is NullEntityType)
             {
-                return internalModelBuilder
+                return _internalModelBuilder
                     .Entity(typeof(TItem))
                     .Property(columnExpression.GetPropertyAccess());
             }
@@ -51,7 +51,7 @@ namespace Blazor.FlexGrid.Components.Configuration
             var configurationProperty = entityType.FindProperty(columnName);
             if (configurationProperty is Property property)
             {
-                return new InternalPropertyBuilder(property, internalModelBuilder);
+                return new InternalPropertyBuilder(property, _internalModelBuilder);
             }
 
             return null;

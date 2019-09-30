@@ -4,21 +4,21 @@ namespace Blazor.FlexGrid.Components
 {
     public class EditColumnContext
     {
-        private readonly string columnName;
-        private readonly Action<string, object> onChangeAction;
+        private readonly string _columnName;
+        private readonly Action<string, object> _onChangeAction;
 
         public EditColumnContext(string columnName, Action<string, object> onChangeAction)
         {
-            this.columnName = string.IsNullOrWhiteSpace(columnName)
+            _columnName = string.IsNullOrWhiteSpace(columnName)
                 ? throw new ArgumentNullException(nameof(columnName))
                 : columnName;
 
-            this.onChangeAction = onChangeAction ?? throw new ArgumentNullException(nameof(onChangeAction));
+            _onChangeAction = onChangeAction ?? throw new ArgumentNullException(nameof(onChangeAction));
         }
 
         public void NotifyValueHasChanged(object value)
         {
-            onChangeAction.Invoke(columnName, value);
+            _onChangeAction.Invoke(_columnName, value);
         }
     }
 }

@@ -48,7 +48,12 @@ namespace Blazor.FlexGrid.Components.Configuration.Builders
 
             return this;
         }
+        public PropertyBuilder<TProperty, TEntity> IsEditable(bool isEditable)
+        {
+	        Builder.IsEditable(isEditable);
 
+	        return this;
+        }
         public PropertyBuilder<TProperty, TEntity> HasOrder(int order)
         {
             Builder.HasOrder(order);

@@ -12,11 +12,11 @@ namespace Blazor.FlexGrid.Components.Renderers
 {
     public class GridHeaderRenderer : GridPartRenderer
     {
-        private readonly FlexGridInterop flexGridInterop;
+        private readonly FlexGridInterop _flexGridInterop;
 
         public GridHeaderRenderer(FlexGridInterop flexGridInterop)
         {
-            this.flexGridInterop = flexGridInterop ?? throw new ArgumentNullException(nameof(flexGridInterop));
+            _flexGridInterop = flexGridInterop ?? throw new ArgumentNullException(nameof(flexGridInterop));
         }
 
         public override bool CanRender(GridRendererContext rendererContext)
@@ -90,7 +90,7 @@ namespace Blazor.FlexGrid.Components.Renderers
             rendererContext.CloseElement();
         }
 
-        private void RenderSortableColumnHeader(GridRendererContext rendererContext, PropertyInfo property, IGridViewColumnAnotations columnConfiguration)
+        private void RenderSortableColumnHeader(GridRendererContext rendererContext, PropertyInfo property, IGridViewColumnAnnotations columnConfiguration)
         {
             rendererContext.OpenElement(HtmlTagNames.Span,
                 rendererContext.SortingByActualColumnName ? "table-cell-head-sortable table-cell-head-sortable-active" : "table-cell-head-sortable");
@@ -131,7 +131,7 @@ namespace Blazor.FlexGrid.Components.Renderers
             rendererContext.OpenElement(HtmlTagNames.Button, "action-button");
             rendererContext.AddOnClickEvent(
                 EventCallback.Factory.Create(this, (MouseEventArgs e) =>
-                    flexGridInterop.ShowModal(CreateItemOptions.CreateItemModalName))
+                    _flexGridInterop.ShowModal(CreateItemOptions.CreateItemModalName))
             );
 
             rendererContext.OpenElement(HtmlTagNames.Span, "action-button-span");
@@ -143,10 +143,10 @@ namespace Blazor.FlexGrid.Components.Renderers
             rendererContext.CloseElement();
         }
 
-        private string GetColumnCaption(IGridViewColumnAnotations columnConfiguration, PropertyInfo property)
+        private string GetColumnCaption(IGridViewColumnAnnotations columnConfiguration, PropertyInfo property)
             => columnConfiguration?.Caption ?? property.Name;
 
-        private string GetColumnStyle(IGridViewColumnAnotations columnConfiguration)
+        private string GetColumnStyle(IGridViewColumnAnnotations columnConfiguration)
             => columnConfiguration?.HeaderStyle ?? string.Empty;
     }
 }

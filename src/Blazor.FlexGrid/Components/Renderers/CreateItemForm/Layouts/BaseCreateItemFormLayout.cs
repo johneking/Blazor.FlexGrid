@@ -30,21 +30,23 @@ namespace Blazor.FlexGrid.Components.Renderers.CreateItemForm.Layouts
         public Action<IRendererTreeBuilder> BuildFormFieldRendererTree(
             PropertyInfo field,
             CreateItemRendererContext<TModel> createItemRendererContext,
-            IFormInputRendererTreeProvider formInputRendererTreeProvider)
+            IFormInputRendererTreeProvider formInputRendererTreeProvider, 
+            string columnName)
         {
-            createItemRendererContext.ActualColumnName = field.Name;
             var inputBuilder = formInputRendererTreeProvider.GetFormInputRendererTreeBuilder(new FormField(field));
-
+            if (inputBuilder == null)
+	            return (builder) => { };
             return builder =>
             {
-                BuildFieldRendererTree(field, createItemRendererContext, inputBuilder)?.Invoke(builder);
+                BuildFieldRendererTree(field, createItemRendererContext, inputBuilder, columnName)?.Invoke(builder);
             };
         }
 
         public virtual Action<IRendererTreeBuilder> BuildFieldRendererTree(
             PropertyInfo field,
             CreateItemRendererContext<TModel> createItemRendererContext,
-            IFormInputRendererBuilder formInputRendererBuilder)
+            IFormInputRendererBuilder formInputRendererBuilder, 
+            string columnName)
         {
             return builder =>
             {
@@ -54,7 +56,7 @@ namespace Blazor.FlexGrid.Components.Renderers.CreateItemForm.Layouts
                     .AddContent(field.Name)
                     .CloseElement();
 
-                formInputRendererBuilder.BuildRendererTree(createItemRendererContext, new FormField(field))?.Invoke(builder);
+                formInputRendererBuilder.BuildRendererTree(createItemRendererContext, new FormField(field), columnName)?.Invoke(builder);
 
                 builder.CloseElement();
             };

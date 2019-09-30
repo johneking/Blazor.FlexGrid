@@ -8,20 +8,20 @@ namespace Blazor.FlexGrid.DataAdapters.Visitors
 {
     public class DetailDataAdapterVisitors : IDetailDataAdapterVisitors
     {
-        private readonly ITypePropertyAccessorCache propertyValueAccessorCache;
-        private readonly IGridConfigurationProvider gridConfigurationProvider;
+        private readonly ITypePropertyAccessorCache _propertyValueAccessorCache;
+        private readonly IGridConfigurationProvider _gridConfigurationProvider;
 
         public DetailDataAdapterVisitors(ITypePropertyAccessorCache propertyValueAccessorCache, IGridConfigurationProvider gridConfigurationProvider)
         {
-            this.propertyValueAccessorCache = propertyValueAccessorCache ?? throw new ArgumentNullException(nameof(propertyValueAccessorCache));
-            this.gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
+            _propertyValueAccessorCache = propertyValueAccessorCache ?? throw new ArgumentNullException(nameof(propertyValueAccessorCache));
+            _gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
         }
 
         public IEnumerable<IDataTableAdapterVisitor> GetVisitors(IMasterDetailRowArguments masterDetailRowArguments)
         {
             var selectedItemType = masterDetailRowArguments.SelectedItem.GetType();
             var detailAdapterItemType = masterDetailRowArguments.DataAdapter.UnderlyingTypeOfItem;
-            var masterDetailConfiguration = gridConfigurationProvider
+            var masterDetailConfiguration = _gridConfigurationProvider
                 .GetGridConfigurationByType(selectedItemType)
                 .FindRelationshipConfiguration(detailAdapterItemType);
 
@@ -29,7 +29,7 @@ namespace Blazor.FlexGrid.DataAdapters.Visitors
             {
                 return new List<IDataTableAdapterVisitor>
                {
-                   new LazyLoadingRouteParamVisitor(masterDetailConfiguration, masterDetailRowArguments, propertyValueAccessorCache)
+                   new LazyLoadingRouteParamVisitor(masterDetailConfiguration, masterDetailRowArguments, _propertyValueAccessorCache)
                };
             }
 
@@ -39,7 +39,7 @@ namespace Blazor.FlexGrid.DataAdapters.Visitors
                 {
                     masterDetailConfiguration,
                     masterDetailRowArguments,
-                    propertyValueAccessorCache
+                    _propertyValueAccessorCache
                 }) as IDataTableAdapterVisitor;
 
             return new List<IDataTableAdapterVisitor>

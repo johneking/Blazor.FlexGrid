@@ -1,22 +1,23 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace Blazor.FlexGrid.Components.Renderers.FormInputs
 {
     public class DateInputBuilder : IFormInputRendererBuilder
     {
-        private readonly EventCallbackFactory eventCallbackFactory;
+        private readonly EventCallbackFactory _eventCallbackFactory;
 
         public DateInputBuilder()
         {
-            this.eventCallbackFactory = new EventCallbackFactory();
+            _eventCallbackFactory = new EventCallbackFactory();
         }
 
-        public Action<IRendererTreeBuilder> BuildRendererTree<TItem>(IActualItemContext<TItem> actualItemContext, FormField field) where TItem : class
+        public Action<IRendererTreeBuilder> BuildRendererTree<TItem>(IActualItemContext<TItem> actualItemContext, FormField field, string localColumnName) where TItem : class
         {
-            var localColumnName = actualItemContext.ActualColumnName;
             var value = actualItemContext.GetActualItemColumnValue(localColumnName);
 
             var valueExpression = GetValueExpression(actualItemContext.ActualItem, field);
@@ -33,19 +34,19 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
                     .AddAttribute("Value", convertedValue)
                     .AddAttribute("ValueExpression", valueExpression);
 
-                if (field.UnderlyneType == typeof(DateTime))
+                if (field.UnderlyingType == typeof(DateTime))
                 {
                     if (field.IsNullable)
                     {
                         builder
-                        .AddAttribute("ValueChanged", eventCallbackFactory.Create<DateTime?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                        .AddAttribute("ValueChanged", _eventCallbackFactory.Create<DateTime?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
                         .CloseComponent()
                         .AddValidationMessage<DateTime?>(valueExpression);
                     }
                     else
                     {
                         builder
-                            .AddAttribute("ValueChanged", eventCallbackFactory.Create<DateTime>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                            .AddAttribute("ValueChanged", _eventCallbackFactory.Create<DateTime>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
                             .CloseComponent()
                             .AddValidationMessage<DateTime>(valueExpression);
                     }
@@ -55,14 +56,14 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
                     if (field.IsNullable)
                     {
                         builder
-                        .AddAttribute("ValueChanged", eventCallbackFactory.Create<DateTimeOffset?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                        .AddAttribute("ValueChanged", _eventCallbackFactory.Create<DateTimeOffset?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
                         .CloseComponent()
                         .AddValidationMessage<DateTimeOffset?>(valueExpression);
                     }
                     else
                     {
                         builder
-                            .AddAttribute("ValueChanged", eventCallbackFactory.Create<DateTimeOffset>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                            .AddAttribute("ValueChanged", _eventCallbackFactory.Create<DateTimeOffset>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
                             .CloseComponent()
                             .AddValidationMessage<DateTimeOffset>(valueExpression);
                     }
@@ -72,12 +73,14 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
             };
         }
 
-        public bool IsSupportedDateType(Type type)
-             => type == typeof(DateTime) || type == typeof(DateTimeOffset);
 
+        public bool IsSupportedDateType(Type type)
+	        => SupportedTypes.Contains(type);
+
+        private static readonly Type[] SupportedTypes = { typeof(DateTime), typeof(DateTimeOffset) };
         private LambdaExpression GetValueExpression(object actualItem, FormField field)
         {
-            if (field.UnderlyneType == typeof(DateTime))
+            if (field.UnderlyingType == typeof(DateTime))
             {
                 if (field.IsNullable)
                 {
@@ -94,7 +97,7 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
                             field.Info));
                 }
             }
-            else if (field.UnderlyneType == typeof(DateTimeOffset))
+            else if (field.UnderlyingType == typeof(DateTimeOffset))
             {
                 if (field.IsNullable)
                 {
@@ -113,7 +116,7 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
                 }
             }
 
-            throw new ArgumentException($"{nameof(DateInputBuilder)} does not support type {field.UnderlyneType}");
+            throw new ArgumentException($"{nameof(DateInputBuilder)} does not support type {field.UnderlyingType}");
         }
 
         private DateTime ConvertToDateTime(object value)

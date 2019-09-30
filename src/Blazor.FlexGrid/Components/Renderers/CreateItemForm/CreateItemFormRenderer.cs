@@ -3,21 +3,20 @@ using Blazor.FlexGrid.Components.Renderers.FormInputs;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Rendering;
-using Microsoft.AspNetCore.Components.RenderTree;
 using System;
 
 namespace Blazor.FlexGrid.Components.Renderers.CreateItemForm
 {
     public class CreateItemFormRenderer<TModel> where TModel : class
     {
-        private readonly IFormInputRendererTreeProvider formInputRendererTreeProvider;
-        private readonly EventCallbackFactory eventCallbackFactory;
+        private readonly IFormInputRendererTreeProvider _formInputRendererTreeProvider;
+        private readonly EventCallbackFactory _eventCallbackFactory;
 
 
         public CreateItemFormRenderer(IFormInputRendererTreeProvider formInputRendererTreeProvider)
         {
-            this.formInputRendererTreeProvider = formInputRendererTreeProvider ?? throw new ArgumentNullException(nameof(formInputRendererTreeProvider));
-            this.eventCallbackFactory = new EventCallbackFactory();
+            _formInputRendererTreeProvider = formInputRendererTreeProvider ?? throw new ArgumentNullException(nameof(formInputRendererTreeProvider));
+            _eventCallbackFactory = new EventCallbackFactory();
         }
 
         public void BuildRendererTree(
@@ -25,7 +24,7 @@ namespace Blazor.FlexGrid.Components.Renderers.CreateItemForm
             CreateItemRendererContext<TModel> createItemRendererContext,
             IRendererTreeBuilder rendererTreeBuilder)
         {
-            var bodyAction = createFormLayout.BuildBodyRendererTree(createItemRendererContext, formInputRendererTreeProvider);
+            var bodyAction = createFormLayout.BuildBodyRendererTree(createItemRendererContext, _formInputRendererTreeProvider);
             var footerAction = createFormLayout.BuildFooterRendererTree(createItemRendererContext);
 
             RenderFragment<EditContext> formBody = (EditContext context) => delegate (RenderTreeBuilder builder)
@@ -42,7 +41,7 @@ namespace Blazor.FlexGrid.Components.Renderers.CreateItemForm
             rendererTreeBuilder
                 .OpenComponent(typeof(EditForm))
                 .AddAttribute(nameof(EditContext), createItemRendererContext.ViewModel.EditContext)
-                .AddAttribute("OnValidSubmit", eventCallbackFactory.Create<EditContext>(this,
+                .AddAttribute("OnValidSubmit", _eventCallbackFactory.Create<EditContext>(this,
                     context => createItemRendererContext.ViewModel.SaveAction.Invoke(createItemRendererContext.ViewModel.Model)))
                 .AddAttribute(BlazorRendererTreeBuilder.ChildContent, formBody)
                 .CloseComponent();

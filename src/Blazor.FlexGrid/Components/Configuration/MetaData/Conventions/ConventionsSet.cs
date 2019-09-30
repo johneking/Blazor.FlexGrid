@@ -5,18 +5,18 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData.Conventions
 {
     public class ConventionsSet
     {
-        private readonly HashSet<Type> conventionsRunnedTypes;
+        private readonly HashSet<Type> _conventionsRunnedTypes;
 
-        private readonly IGridConfigurationProvider gridConfigurationProvider;
+        private readonly IGridConfigurationProvider _gridConfigurationProvider;
 
         public virtual IList<IConvention> Conventions { get; }
 
         public ConventionsSet(IGridConfigurationProvider gridConfigurationProvider)
         {
-            this.gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
-            this.conventionsRunnedTypes = new HashSet<Type>();
+            _gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
+            _conventionsRunnedTypes = new HashSet<Type>();
 
-            Conventions = new List<IConvention>()
+            Conventions = new List<IConvention>
             {
                 new MasterDetailConvention(gridConfigurationProvider)
             };
@@ -24,7 +24,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData.Conventions
 
         public virtual void ApplyConventions(Type type)
         {
-            if (conventionsRunnedTypes.Contains(type))
+            if (_conventionsRunnedTypes.Contains(type))
             {
                 return;
             }
@@ -34,7 +34,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData.Conventions
                 convention.Apply(type);
             }
 
-            conventionsRunnedTypes.Add(type);
+            _conventionsRunnedTypes.Add(type);
         }
     }
 }

@@ -6,13 +6,13 @@ namespace Blazor.FlexGrid.DataSet
 {
     public class MasterDetailTableDataSetFactory : IMasterDetailTableDataSetFactory
     {
-        private readonly IGridConfigurationProvider gridConfigurationProvider;
-        private readonly ITableDataAdapterProvider tableDataAdapterProvider;
+        private readonly IGridConfigurationProvider _gridConfigurationProvider;
+        private readonly ITableDataAdapterProvider _tableDataAdapterProvider;
 
         public MasterDetailTableDataSetFactory(IGridConfigurationProvider gridConfigurationProvider, ITableDataAdapterProvider tableDataAdapterProvider)
         {
-            this.gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
-            this.tableDataAdapterProvider = tableDataAdapterProvider ?? throw new ArgumentNullException(nameof(tableDataAdapterProvider));
+            _gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
+            _tableDataAdapterProvider = tableDataAdapterProvider ?? throw new ArgumentNullException(nameof(tableDataAdapterProvider));
         }
 
         public ITableDataSet ConvertToMasterTableIfIsRequired(ITableDataSet tableDataSet)
@@ -23,7 +23,7 @@ namespace Blazor.FlexGrid.DataSet
             }
 
             var tableDataSetItemType = tableDataSet.UnderlyingTypeOfItem();
-            var entityConfiguration = gridConfigurationProvider.GetGridConfigurationByType(tableDataSetItemType);
+            var entityConfiguration = _gridConfigurationProvider.GetGridConfigurationByType(tableDataSetItemType);
             if (!entityConfiguration.IsMasterTable)
             {
                 return tableDataSet;
@@ -31,7 +31,7 @@ namespace Blazor.FlexGrid.DataSet
 
             var masterDetailTableDataSetType = typeof(MasterDetailTableDataSet<>).MakeGenericType(tableDataSetItemType);
             var masterDetailTableDataSet = Activator.CreateInstance(masterDetailTableDataSetType,
-                new object[] { tableDataSet, gridConfigurationProvider, tableDataAdapterProvider }) as IMasterTableDataSet;
+                new object[] { tableDataSet, _gridConfigurationProvider, _tableDataAdapterProvider }) as IMasterTableDataSet;
 
             return masterDetailTableDataSet;
         }

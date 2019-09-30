@@ -11,13 +11,13 @@ namespace Blazor.FlexGrid.Components.Renderers
 {
     public class GridBodyGroupedRenderer : GridCompositeRenderer
     {
-        private readonly ITableDataAdapterProvider tableDataAdapterProvider;
-        private readonly ILogger<GridBodyGroupedRenderer> logger;
+        private readonly ITableDataAdapterProvider _tableDataAdapterProvider;
+        private readonly ILogger<GridBodyGroupedRenderer> _logger;
 
         public GridBodyGroupedRenderer(ITableDataAdapterProvider tableDataAdapterProvider, ILogger<GridBodyGroupedRenderer> logger)
         {
-            this.tableDataAdapterProvider = tableDataAdapterProvider ?? throw new ArgumentNullException(nameof(tableDataAdapterProvider));
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _tableDataAdapterProvider = tableDataAdapterProvider ?? throw new ArgumentNullException(nameof(tableDataAdapterProvider));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public override bool CanRender(GridRendererContext rendererContext)
@@ -25,7 +25,7 @@ namespace Blazor.FlexGrid.Components.Renderers
 
         protected override void BuildRenderTreeInternal(GridRendererContext rendererContext, PermissionContext permissionContext)
         {
-            using (new MeasurableScope(sw => logger.LogInformation($"Grid grouped body rendering duration {sw.ElapsedMilliseconds}ms")))
+            using (new MeasurableScope(sw => _logger.LogInformation($"Grid grouped body rendering duration {sw.ElapsedMilliseconds}ms")))
             {
                 rendererContext.OpenElement(HtmlTagNames.TableBody, rendererContext.CssClasses.TableBody);
                 foreach (var group in rendererContext.TableDataSet.GroupedItems)
@@ -56,9 +56,9 @@ namespace Blazor.FlexGrid.Components.Renderers
 
                         if (!group.IsCollapsed)
                         {
-                            var dataAdapter = tableDataAdapterProvider.CreateCollectionTableDataAdapter(rendererContext.TableDataSet.UnderlyingTypeOfItem(), group);
+                            var dataAdapter = _tableDataAdapterProvider.CreateCollectionTableDataAdapter(rendererContext.TableDataSet.UnderlyingTypeOfItem(), group);
                             var masterTableFeature = rendererContext.FlexGridContext.Features.Get<IMasterTableFeature>();
-                            dataAdapter = tableDataAdapterProvider.CreateMasterTableDataAdapter(dataAdapter, masterTableFeature);
+                            dataAdapter = _tableDataAdapterProvider.CreateMasterTableDataAdapter(dataAdapter, masterTableFeature);
 
                             rendererContext.AddGridViewComponent(dataAdapter);
                         }
@@ -68,7 +68,7 @@ namespace Blazor.FlexGrid.Components.Renderers
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError($"Error occured during rendering grouped grid view body. Ex: {ex}");
+                        _logger.LogError($"Error occured during rendering grouped grid view body. Ex: {ex}");
 
                         throw ex;
                     }

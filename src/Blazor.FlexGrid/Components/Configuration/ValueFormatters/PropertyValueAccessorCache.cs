@@ -6,13 +6,13 @@ namespace Blazor.FlexGrid.Components.Configuration.ValueFormatters
 {
     public class PropertyValueAccessorCache : ITypePropertyAccessorCache
     {
-        private readonly Dictionary<Type, ITypePropertyAccessor> propertyAccessors;
-        private readonly ILogger<PropertyValueAccessorCache> logger;
+        private readonly Dictionary<Type, ITypePropertyAccessor> _propertyAccessors;
+        private readonly ILogger<PropertyValueAccessorCache> _logger;
 
         public PropertyValueAccessorCache(ILogger<PropertyValueAccessorCache> logger)
         {
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            this.propertyAccessors = new Dictionary<Type, ITypePropertyAccessor>();
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _propertyAccessors = new Dictionary<Type, ITypePropertyAccessor>();
         }
 
         public void AddPropertyAccessor(Type type, ITypePropertyAccessor propertyValueAccessor)
@@ -27,12 +27,12 @@ namespace Blazor.FlexGrid.Components.Configuration.ValueFormatters
                 throw new ArgumentNullException(nameof(propertyValueAccessor));
             }
 
-            if (propertyAccessors.ContainsKey(type))
+            if (_propertyAccessors.ContainsKey(type))
             {
                 return;
             }
 
-            propertyAccessors.Add(type, propertyValueAccessor);
+            _propertyAccessors.Add(type, propertyValueAccessor);
         }
 
         public ITypePropertyAccessor GetPropertyAccesor(Type type)
@@ -42,13 +42,13 @@ namespace Blazor.FlexGrid.Components.Configuration.ValueFormatters
                 throw new ArgumentNullException(nameof(type));
             }
 
-            if (propertyAccessors.TryGetValue(type, out var propertyValueAccessor))
+            if (_propertyAccessors.TryGetValue(type, out var propertyValueAccessor))
             {
                 return propertyValueAccessor;
             }
 
-            propertyValueAccessor = new TypeWrapper(type, logger);
-            propertyAccessors.Add(type, propertyValueAccessor);
+            propertyValueAccessor = new TypeWrapper(type, _logger);
+            _propertyAccessors.Add(type, propertyValueAccessor);
 
             return propertyValueAccessor;
         }

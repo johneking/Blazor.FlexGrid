@@ -7,16 +7,16 @@ namespace Blazor.FlexGrid.Components.Renderers
 {
     public class GridBodySimpleRenderer : GridCompositeRenderer
     {
-        private readonly ILogger<GridBodySimpleRenderer> logger;
+        private readonly ILogger<GridBodySimpleRenderer> _logger;
 
         public GridBodySimpleRenderer(ILogger<GridBodySimpleRenderer> logger)
         {
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         protected override void BuildRenderTreeInternal(GridRendererContext rendererContext, PermissionContext permissionContext)
         {
-            using (new MeasurableScope(sw => logger.LogInformation($"Grid body rendering duration {sw.ElapsedMilliseconds}ms")))
+            using (new MeasurableScope(sw => _logger.LogInformation($"Grid body rendering duration {sw.ElapsedMilliseconds}ms")))
             {
                 rendererContext.OpenElement(HtmlTagNames.TableBody, rendererContext.CssClasses.TableBody);
 
@@ -25,14 +25,14 @@ namespace Blazor.FlexGrid.Components.Renderers
                     foreach (var item in rendererContext.TableDataSet.Items)
                     {
                         rendererContext.ActualItem = item;
-                        foreach (var renderer in gridPartRenderers)
+                        foreach (var renderer in GridPartRenderers)
                             renderer.BuildRendererTree(rendererContext, permissionContext);
                     }
 
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError($"Error occured during rendering grid view body. Ex: {ex}");
+                    _logger.LogError($"Error occured during rendering grid view body. Ex: {ex}");
                 }
 
                 rendererContext.CloseElement();

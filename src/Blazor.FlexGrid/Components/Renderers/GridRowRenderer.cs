@@ -31,12 +31,12 @@ namespace Blazor.FlexGrid.Components.Renderers
                 rendererContext.ActualColumnName = property.Name;
                 rendererContext.ActualColumnPropertyCanBeEdited = property.CanWrite;
 
-                gridPartRenderers.ForEach(renderer => renderer.BuildRendererTree(rendererContext, permissionContext));
+                GridPartRenderers.ForEach(renderer => renderer.BuildRendererTree(rendererContext, permissionContext));
             }
 
             rendererContext.CloseElement();
 
-            gridPartRenderersAfter.ForEach(renderer => renderer.BuildRendererTree(rendererContext, permissionContext));
+            GridPartRenderersAfter.ForEach(renderer => renderer.BuildRendererTree(rendererContext, permissionContext));
         }
     }
 }

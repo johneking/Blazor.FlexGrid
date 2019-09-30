@@ -5,28 +5,28 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData.Conventions
 {
     public abstract class BaseConvention : IConvention
     {
-        protected readonly InternalModelBuilder internalModelBuilder;
-        private readonly IGridConfigurationProvider gridConfigurationProvider;
+        protected readonly InternalModelBuilder InternalModelBuilder;
+        private readonly IGridConfigurationProvider _gridConfigurationProvider;
 
-        public BaseConvention(IGridConfigurationProvider gridConfigurationProvider)
+        protected BaseConvention(IGridConfigurationProvider gridConfigurationProvider)
         {
-            this.gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
-            this.internalModelBuilder = new InternalModelBuilder(gridConfigurationProvider.ConfigurationModel as Model);
+            _gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
+            InternalModelBuilder = new InternalModelBuilder(gridConfigurationProvider.ConfigurationModel as Model);
         }
 
         public void Apply(Type type)
         {
-            var entityType = gridConfigurationProvider.FindGridEntityConfigurationByType(type);
+            var entityType = _gridConfigurationProvider.FindGridEntityConfigurationByType(type);
             if (entityType is NullEntityType)
             {
-                var entityTypeBuilder = internalModelBuilder
+                var entityTypeBuilder = InternalModelBuilder
                     .Entity(type);
 
                 Apply(entityTypeBuilder);
             }
             else
             {
-                Apply(new InternalEntityTypeBuilder(entityType as EntityType, internalModelBuilder));
+                Apply(new InternalEntityTypeBuilder(entityType as EntityType, InternalModelBuilder));
             }
         }
 

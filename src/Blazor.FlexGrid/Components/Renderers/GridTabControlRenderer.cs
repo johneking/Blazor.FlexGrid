@@ -11,11 +11,11 @@ namespace Blazor.FlexGrid.Components.Renderers
 {
     public class GridTabControlRenderer : GridPartRenderer
     {
-        private readonly ITableDataAdapterProvider tableDataAdapterProvider;
+        private readonly ITableDataAdapterProvider _tableDataAdapterProvider;
 
         public GridTabControlRenderer(ITableDataAdapterProvider tableDataAdapterProvider)
         {
-            this.tableDataAdapterProvider = tableDataAdapterProvider ?? throw new ArgumentNullException(nameof(tableDataAdapterProvider));
+            _tableDataAdapterProvider = tableDataAdapterProvider ?? throw new ArgumentNullException(nameof(tableDataAdapterProvider));
         }
 
         public override bool CanRender(GridRendererContext rendererContext)
@@ -69,7 +69,7 @@ namespace Blazor.FlexGrid.Components.Renderers
             {
                 if (permissionContext.HasCurrentUserReadPermission(collectionProperty.Name))
                 {
-                    var dataAdapter = tableDataAdapterProvider.CreateCollectionTableDataAdapter(rendererContext.ActualItem, collectionProperty);
+                    var dataAdapter = _tableDataAdapterProvider.CreateCollectionTableDataAdapter(rendererContext.ActualItem, collectionProperty);
                     RenderTab(rendererContext, masterTableDataSet, selectedDataAdapter, dataAdapter);
                 }
             }

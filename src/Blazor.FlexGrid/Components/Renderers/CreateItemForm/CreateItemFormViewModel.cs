@@ -6,7 +6,7 @@ namespace Blazor.FlexGrid.Components.Renderers.CreateItemForm
 {
     public class CreateItemFormViewModel<TModel> : ICreateItemFormViewModel<TModel> where TModel : class
     {
-        private readonly CreateItemOptions createItemOptions;
+        private readonly CreateItemOptions _createItemOptions;
 
         public TModel Model { get; private set; }
 
@@ -18,7 +18,7 @@ namespace Blazor.FlexGrid.Components.Renderers.CreateItemForm
 
         public CreateItemFormViewModel(CreateItemOptions createItemOptions)
         {
-            this.createItemOptions = createItemOptions ?? throw new ArgumentNullException(nameof(createItemOptions));
+            _createItemOptions = createItemOptions ?? throw new ArgumentNullException(nameof(createItemOptions));
             Model = Activator.CreateInstance(typeof(TModel)) as TModel;
             EditContext = new EditContext(Model);
             EditContext.OnFieldChanged += OnFieldChanged;

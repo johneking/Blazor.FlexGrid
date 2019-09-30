@@ -16,7 +16,7 @@ namespace Blazor.FlexGrid.Components.Configuration
         public IEntityType FindGridEntityConfigurationByType(Type clrType)
             => ConfigurationModel.FindEntityType(clrType) ?? NullEntityType.Instance;
 
-        public IGridViewAnotations GetGridConfigurationByType(Type clrType)
-            => new GridAnotations(FindGridEntityConfigurationByType(clrType));
+        public IGridViewAnnotations GetGridConfigurationByType(Type clrType)
+            => new GridAnnotations(FindGridEntityConfigurationByType(clrType));
     }
 }

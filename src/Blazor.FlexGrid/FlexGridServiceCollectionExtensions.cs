@@ -29,6 +29,41 @@ namespace Blazor.FlexGrid
                 options.IsServerSideBlazorApp = true;
             });
 
+		
+        public static IServiceCollection AddCustomFlexGrid(
+            this IServiceCollection services,
+            Action<IModelConfiguration> configureGridComponents = null,
+            Action<FlexGridOptions> configureOptions = null)
+        {
+			
+            var modelBuilder = new ModelBuilder();
+            var flexGridOptions = new FlexGridOptions();
+            configureGridComponents?.Invoke(modelBuilder);
+            
+            configureOptions?.Invoke(flexGridOptions);
+
+            flexGridOptions.IsServerSideBlazorApp = true; // hack
+
+            services.AddLogging(builder => builder.AddConsole());
+            services.TryAddScoped(typeof(ILazyGroupableDataSetLoader<>), typeof(NullLazyGroupableDataSetLoader<>));
+            services.AddScoped<FlexGridInterop>();
+            services.AddScoped(typeof(LazyLoadedTableDataAdapter<>));
+            RegisterRendererTreeBuildersScoped(services);
+
+
+            services.TryAddSingleton<IAuthorizationService, NullAuthorizationService>();
+            services.TryAddSingleton<ICurrentUserPermission>(new NullCurrentUserPermission());
+            services.AddSingleton(typeof(MasterTableDataAdapterBuilder<>));
+            services.AddSingleton(typeof(IGridConfigurationProvider), new GridConfigurationProvider(modelBuilder.Model));
+            services.AddSingleton<IMasterDetailTableDataSetFactory, MasterDetailTableDataSetFactory>();
+            services.AddSingleton<ConventionsSet>();
+            services.AddSingleton<ITypePropertyAccessorCache, PropertyValueAccessorCache>();
+            services.AddSingleton<IDetailDataAdapterVisitors, DetailDataAdapterVisitors>();
+            services.AddSingleton<ITableDataAdapterProvider, RunTimeTableDataAdapterProvider>();
+            RegisterFormInputBuilders(services);
+
+            return services;
+        }
         public static IServiceCollection AddFlexGrid(
             this IServiceCollection services,
             Action<IModelConfiguration> configureGridComponents = null,
@@ -104,26 +139,20 @@ namespace Blazor.FlexGrid
         {
             services.AddSingleton(typeof(CreateItemFormRenderer<>));
             services.AddSingleton(typeof(BlazorComponentColumnCollection<>));
-            services.AddSingleton<GridContextsFactory>();
+            services.AddSingleton<GridContextFactory>();
             services.AddSingleton<EditInputRendererTree>();
 
-            services.AddSingleton(typeof(IGridRendererTreeBuilder), provider =>
-            {
-                return CreateGridRenderer(provider);
-            });
+            services.AddSingleton(typeof(IGridRendererTreeBuilder), CreateGridRenderer);
         }
 
         private static void RegisterRendererTreeBuildersScoped(IServiceCollection services)
         {
             services.AddSingleton(typeof(CreateItemFormRenderer<>));
             services.AddSingleton(typeof(BlazorComponentColumnCollection<>));
-            services.AddSingleton<GridContextsFactory>();
+            services.AddSingleton<GridContextFactory>();
             services.AddSingleton<EditInputRendererTree>();
 
-            services.AddScoped(typeof(IGridRendererTreeBuilder), provider =>
-            {
-                return CreateGridRenderer(provider);
-            });
+            services.AddScoped(typeof(IGridRendererTreeBuilder), CreateGridRenderer);
         }
 
         private static object CreateGridRenderer(IServiceProvider provider)

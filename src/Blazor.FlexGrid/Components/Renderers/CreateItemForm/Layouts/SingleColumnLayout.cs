@@ -3,10 +3,10 @@ using System;
 
 namespace Blazor.FlexGrid.Components.Renderers.CreateItemForm.Layouts
 {
-    public class SignleColumnLayout<TModel> : BaseCreateItemFormLayout<TModel> where TModel : class
+    public class SingleColumnLayout<TModel> : BaseCreateItemFormLayout<TModel> where TModel : class
     {
         public override Action<IRendererTreeBuilder> BuildBodyRendererTree(
-            CreateItemRendererContext<TModel> createItemRendererContext,
+            CreateItemRendererContext<TModel> createItemRendererContext, // todo - add wrapped properties to this with annotation info
             IFormInputRendererTreeProvider formInputRendererTreeProvider)
         {
             return builder =>
@@ -15,7 +15,9 @@ namespace Blazor.FlexGrid.Components.Renderers.CreateItemForm.Layouts
 
                 foreach (var field in createItemRendererContext.GetModelFields())
                 {
-                    BuildFormFieldRendererTree(field, createItemRendererContext, formInputRendererTreeProvider)?.Invoke(builder);
+                    //var configProperty = entityType.FindProperty(field.Name);
+                    //if(configProperty == null || configProperty.IsEditable)
+                    BuildFormFieldRendererTree(field, createItemRendererContext, formInputRendererTreeProvider, field.Name)?.Invoke(builder);
                 }
 
                 builder.CloseElement();

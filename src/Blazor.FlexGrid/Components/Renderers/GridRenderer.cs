@@ -9,11 +9,11 @@ namespace Blazor.FlexGrid.Components.Renderers
     /// </summary>
     public class GridRenderer : GridCompositeRenderer
     {
-        private readonly ILogger<GridRenderer> logger;
+        private readonly ILogger<GridRenderer> _logger;
 
         public GridRenderer(ILogger<GridRenderer> logger)
         {
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public override bool CanRender(GridRendererContext rendererContext)
@@ -21,26 +21,26 @@ namespace Blazor.FlexGrid.Components.Renderers
 
         protected override void BuildRenderTreeInternal(GridRendererContext rendererContext, PermissionContext permissionContext)
         {
-            using (new MeasurableScope(sw => logger.LogInformation($"Grid rendering duration {sw.ElapsedMilliseconds}ms")))
+            using (new MeasurableScope(sw => _logger.LogInformation($"Grid rendering duration {sw.ElapsedMilliseconds}ms")))
             {
                 try
                 {
-                    gridPartRenderersBefore.ForEach(renderer => renderer.BuildRendererTree(rendererContext, permissionContext));
+                    GridPartRenderersBefore.ForEach(renderer => renderer.BuildRendererTree(rendererContext, permissionContext));
 
                     rendererContext.OpenElement(HtmlTagNames.Div, "table-wrapper");
                     rendererContext.OpenElement(HtmlTagNames.Table, rendererContext.CssClasses.Table);
 
-                    gridPartRenderers.ForEach(renderer => renderer.BuildRendererTree(rendererContext, permissionContext));
+                    GridPartRenderers.ForEach(renderer => renderer.BuildRendererTree(rendererContext, permissionContext));
 
                     rendererContext.CloseElement(); // Close table
 
-                    gridPartRenderersAfter.ForEach(renderer => renderer.BuildRendererTree(rendererContext, permissionContext));
+                    GridPartRenderersAfter.ForEach(renderer => renderer.BuildRendererTree(rendererContext, permissionContext));
 
                     rendererContext.CloseElement(); // Close table wrapper                
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError($"Error raised during rendering GridView component. Ex: {ex}");
+                    _logger.LogError($"Error raised during rendering GridView component. Ex: {ex}");
                 }
             }
         }

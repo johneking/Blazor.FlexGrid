@@ -1,32 +1,31 @@
-﻿using Blazor.FlexGrid.Components.Configuration.ValueFormatters;
-using Blazor.FlexGrid.DataSet.Http;
+﻿using System;
+using System.Net.Http;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Blazor.FlexGrid.Components.Configuration.ValueFormatters;
 using Blazor.FlexGrid.DataSet.Options;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Net.Http;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace Blazor.FlexGrid.DataSet
+namespace Blazor.FlexGrid.DataSet.Http
 {
     public class HttpLazyDataSetItemManipulator<TItem> : ILazyDataSetItemManipulator<TItem> where TItem : class
     {
         private const string DeleteUrlPattern = @"\/{\s*(?<prop>\w+)\s*(,\s*(?<prop>\w+)\s*)*}";
 
-        private readonly HttpClient httpClient;
-        private readonly ITypePropertyAccessorCache propertyValueAccessorCache;
-        private readonly ILogger<HttpLazyDataSetItemManipulator<TItem>> logger;
+        private readonly HttpClient _httpClient;
+        private readonly ITypePropertyAccessorCache _propertyValueAccessorCache;
+        private readonly ILogger<HttpLazyDataSetItemManipulator<TItem>> _logger;
 
         public HttpLazyDataSetItemManipulator(
             IHttpClientFactory httpClientFactory,
             ITypePropertyAccessorCache propertyValueAccessorCache,
             ILogger<HttpLazyDataSetItemManipulator<TItem>> logger)
         {
-            this.httpClient = httpClientFactory?.Create() ?? throw new ArgumentNullException(nameof(httpClientFactory));
-            this.propertyValueAccessorCache = propertyValueAccessorCache ?? throw new ArgumentNullException(nameof(propertyValueAccessorCache));
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _httpClient = httpClientFactory?.Create() ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            _propertyValueAccessorCache = propertyValueAccessorCache ?? throw new ArgumentNullException(nameof(propertyValueAccessorCache));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<TItem> SaveItem(TItem item, ILazyLoadingOptions lazyLoadingOptions)
@@ -39,13 +38,13 @@ namespace Blazor.FlexGrid.DataSet
 
             try
             {
-                var response = await httpClient.PutJsonAsync<TItem>(lazyLoadingOptions.PutDataUri, item);
+                var response = await _httpClient.PutJsonAsync<TItem>(lazyLoadingOptions.PutDataUri, item);
 
                 return response;
             }
             catch (Exception ex)
             {
-                logger.LogError($"Error during saving data for [{lazyLoadingOptions.PutDataUri}]. Ex: {ex}");
+                _logger.LogError($"Error during saving data for [{lazyLoadingOptions.PutDataUri}]. Ex: {ex}");
 
                 return null;
             }
@@ -70,7 +69,7 @@ namespace Blazor.FlexGrid.DataSet
             try
             {
                 var keyPropertyNames = match.Groups["prop"].Captures;
-                var propertyValueAccessor = propertyValueAccessorCache.GetPropertyAccesor(typeof(TItem));
+                var propertyValueAccessor = _propertyValueAccessorCache.GetPropertyAccesor(typeof(TItem));
                 var query = new QueryBuilder();
                 foreach (Capture keyPropertyName in keyPropertyNames)
                 {
@@ -79,7 +78,7 @@ namespace Blazor.FlexGrid.DataSet
                 }
                 realDeleteUri = Regex.Replace(lazyLoadingOptions.DeleteUri, DeleteUrlPattern, query.ToString());
 
-                var response = await httpClient.DeleteAsync(realDeleteUri);
+                var response = await _httpClient.DeleteAsync(realDeleteUri);
                 if (response.IsSuccessStatusCode)
                 {
                     return item;
@@ -89,7 +88,7 @@ namespace Blazor.FlexGrid.DataSet
             }
             catch (Exception ex)
             {
-                logger.LogError($"Error during deleting item for uri [{realDeleteUri}]. Ex: {ex}");
+                _logger.LogError($"Error during deleting item for uri [{realDeleteUri}]. Ex: {ex}");
 
                 return null;
             }

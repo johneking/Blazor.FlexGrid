@@ -5,7 +5,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
 {
     public class Annotatable : IAnnotatable
     {
-        private readonly SortedDictionary<string, Annotation> annotations;
+        private readonly SortedDictionary<string, Annotation> _annotations;
 
         public object this[string name]
         {
@@ -31,23 +31,23 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
 
         public Annotatable()
         {
-            this.annotations = new SortedDictionary<string, Annotation>();
+            _annotations = new SortedDictionary<string, Annotation>();
         }
 
         public Annotation FindAnnotation(string name)
-            => annotations.TryGetValue(name, out var annotation)
+            => _annotations.TryGetValue(name, out var annotation)
                     ? annotation
                     : NullAnnotation.Instance;
 
 
         public IEnumerable<IAnnotation> GetAllAnnotations()
-            => annotations.Values;
+            => _annotations.Values;
 
         public Annotation SetAnnotation(string name, object value)
         {
             var annotation = CreateAnnotation(name, value);
 
-            annotations[name] = annotation;
+            _annotations[name] = annotation;
 
             return annotation;
         }
@@ -60,7 +60,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
                 return NullAnnotation.Instance;
             }
 
-            annotations.Remove(name);
+            _annotations.Remove(name);
 
             return annotation;
         }

@@ -6,9 +6,9 @@ namespace Blazor.FlexGrid.Permission
 {
     public class PermissionContext
     {
-        private readonly ICurrentUserPermission currentUserPermission;
-        private readonly IEntityType gridEntityConfiguration;
-        private readonly Dictionary<string, PermissionAccess> columnPermissions;
+        private readonly ICurrentUserPermission _currentUserPermission;
+        private readonly IEntityType _gridEntityConfiguration;
+        private readonly Dictionary<string, PermissionAccess> _columnPermissions;
 
         public bool HasDeleteItemPermission { get; }
 
@@ -16,20 +16,20 @@ namespace Blazor.FlexGrid.Permission
 
         public PermissionContext(ICurrentUserPermission currentUserPermission, IEntityType gridEntityConfiguration)
         {
-            this.currentUserPermission = currentUserPermission ?? throw new ArgumentNullException(nameof(currentUserPermission));
-            this.gridEntityConfiguration = gridEntityConfiguration ?? throw new ArgumentNullException(nameof(gridEntityConfiguration));
-            columnPermissions = new Dictionary<string, PermissionAccess>();
+            _currentUserPermission = currentUserPermission ?? throw new ArgumentNullException(nameof(currentUserPermission));
+            _gridEntityConfiguration = gridEntityConfiguration ?? throw new ArgumentNullException(nameof(gridEntityConfiguration));
+            _columnPermissions = new Dictionary<string, PermissionAccess>();
 
-            HasDeleteItemPermission = new GridAnotations(gridEntityConfiguration)
+            HasDeleteItemPermission = new GridAnnotations(gridEntityConfiguration)
                 .InlineEditOptions.DeletePermissionRestriction(currentUserPermission);
 
-            HasCreateItemPermission = new GridAnotations(gridEntityConfiguration)
+            HasCreateItemPermission = new GridAnnotations(gridEntityConfiguration)
                 .CreateItemOptions.CreatePermissionRestriction(currentUserPermission);
         }
 
         public bool HasCurrentUserReadPermission(string columnName)
         {
-            if (columnPermissions.TryGetValue(columnName, out var permission))
+            if (_columnPermissions.TryGetValue(columnName, out var permission))
             {
                 permission.HasFlag(PermissionAccess.Read);
             }
@@ -39,7 +39,7 @@ namespace Blazor.FlexGrid.Permission
 
         public bool HasCurrentUserWritePermission(string columnName)
         {
-            if (columnPermissions.TryGetValue(columnName, out var permission))
+            if (_columnPermissions.TryGetValue(columnName, out var permission))
             {
                 permission.HasFlag(PermissionAccess.Write);
             }
@@ -47,7 +47,7 @@ namespace Blazor.FlexGrid.Permission
             return true;
         }
 
-        public void ResolveColumnPermission(IGridViewColumnAnotations columnConfig, string columnName)
+        public void ResolveColumnPermission(IGridViewColumnAnnotations columnConfig, string columnName)
         {
             var permissionAccess = PermissionAccess.None;
             if (columnConfig is null)
@@ -56,16 +56,16 @@ namespace Blazor.FlexGrid.Permission
             }
             else
             {
-                permissionAccess |= columnConfig.ReadPermissionRestrictionFunc(currentUserPermission)
+                permissionAccess |= columnConfig.ReadPermissionRestrictionFunc(_currentUserPermission)
                    ? PermissionAccess.Read
                    : PermissionAccess.None;
 
-                permissionAccess |= columnConfig.WritePermissionRestrictionFunc(currentUserPermission)
+                permissionAccess |= columnConfig.WritePermissionRestrictionFunc(_currentUserPermission)
                    ? PermissionAccess.Write
                    : PermissionAccess.None;
             }
 
-            columnPermissions.Add(columnName, permissionAccess);
+            _columnPermissions.Add(columnName, permissionAccess);
         }
     }
 }

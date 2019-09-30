@@ -2,9 +2,7 @@
 {
     public interface IActualItemContext<out TItem> where TItem : class
     {
-        string ActualColumnName { get; }
-
-        TItem ActualItem { get; }
+	    TItem ActualItem { get; }
 
         object GetActualItemColumnValue(string columnName);
 

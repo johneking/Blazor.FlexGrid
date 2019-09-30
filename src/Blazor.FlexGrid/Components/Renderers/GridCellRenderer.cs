@@ -6,11 +6,11 @@ namespace Blazor.FlexGrid.Components.Renderers
 {
     public class GridCellRenderer : GridPartRenderer
     {
-        private readonly EditInputRendererTree editInputRendererTree;
+        private readonly EditInputRendererTree _editInputRendererTree;
 
         public GridCellRenderer(EditInputRendererTree editInputRendererTree)
         {
-            this.editInputRendererTree = editInputRendererTree ?? throw new ArgumentNullException(nameof(editInputRendererTree));
+            _editInputRendererTree = editInputRendererTree ?? throw new ArgumentNullException(nameof(editInputRendererTree));
         }
 
         public override bool CanRender(GridRendererContext rendererContext)
@@ -28,7 +28,7 @@ namespace Blazor.FlexGrid.Components.Renderers
                 return;
             }
 
-            rendererContext.AddEditField(editInputRendererTree, permissionContext);
+            rendererContext.AddEditField(_editInputRendererTree, permissionContext);
             rendererContext.CloseElement();
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Blazor.FlexGrid.Components.Configuration.MetaData
 {
@@ -6,7 +7,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
     {
         public int Compare(EntityType x, EntityType y)
         {
-            return x.Name.CompareTo(y.Name);
+            return string.Compare(x.Name, y.Name, StringComparison.Ordinal);
         }
     }
 }

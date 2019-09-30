@@ -1,6 +1,6 @@
 ﻿namespace Blazor.FlexGrid.DataAdapters
 {
-    public class ITableDataAdapterCreator
+    public class TableDataAdapterCreator
     {
     }
 }

@@ -12,7 +12,7 @@ namespace Blazor.FlexGrid.DataSet
 
         void EditItemProperty(string propertyName, object propertyValue);
 
-        void CancelEditation();
+        void CancelEdit();
 
         Task<bool> SaveItem(ITypePropertyAccessor propertyValueAccessor);
 

@@ -15,16 +15,16 @@ namespace Blazor.FlexGrid.Components.Renderers
 
     public class RenderFragmentAdapter<TItem> : IRenderFragmentAdapter<TItem>
     {
-        private readonly RenderFragment<TItem> renderFragment;
+        private readonly RenderFragment<TItem> _renderFragment;
 
 
         public RenderFragmentAdapter(RenderFragment<TItem> renderFragment)
         {
-            this.renderFragment = renderFragment ?? throw new ArgumentNullException(nameof(renderFragment));
+            _renderFragment = renderFragment ?? throw new ArgumentNullException(nameof(renderFragment));
         }
 
         public RenderFragment GetColumnFragment(TItem item)
-            => renderFragment(item);
+            => _renderFragment(item);
 
         public RenderFragment GetColumnFragment(object item)
             => GetColumnFragment((TItem)item);

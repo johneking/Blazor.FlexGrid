@@ -2,7 +2,7 @@
 
 namespace Blazor.FlexGrid.Components.Configuration.MetaData
 {
-    public interface IGridViewAnotations
+    public interface IGridViewAnnotations
     {
         bool IsMasterTable { get; }
 

@@ -10,8 +10,7 @@ namespace Blazor.FlexGrid.Filters
         private static readonly MethodInfo StartsWithMethod = typeof(string).GetMethod("StartsWith", new Type[] { typeof(string) });
         private static readonly MethodInfo EndsWithMethod = typeof(string).GetMethod("EndsWith", new Type[] { typeof(string) });
 
-        public static Expression ConvertToExpression<TParameter>(IFilterDefinition filter, ParameterExpression parameter)
-            where TParameter : class
+        public static Expression ConvertToExpression(IFilterDefinition filter, ParameterExpression parameter)
         {
             var memberExpression = Expression.Property(parameter, filter.ColumnName);
             var constantExpression = Expression.Constant(filter.Value);

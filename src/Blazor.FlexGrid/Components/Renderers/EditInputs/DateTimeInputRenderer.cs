@@ -5,39 +5,38 @@ namespace Blazor.FlexGrid.Components.Renderers.EditInputs
 {
     public class DateTimeInputRenderer : AbstractEditInputRenderer
     {
-        public override void BuildInputRendererTree(IRendererTreeBuilder rendererTreeBuilder, IActualItemContext<object> actualItemContext, Action<string, object> onChangeAction)
+        public override void BuildInputRendererTree(IRendererTreeBuilder rendererTreeBuilder, IActualItemContext<object> actualItemContext, Action<string, object> onChangeAction, string columnName)
         {
-            var localColumnName = actualItemContext.ActualColumnName;
-            var value = actualItemContext.GetActualItemColumnValue(localColumnName);
+            var value = actualItemContext.GetActualItemColumnValue(columnName);
             if (IsSupportedDateType(value))
             {
                 var dateTimeValue = ConvertToDateTime(value);
-                var dateValueContatinsTime = dateTimeValue.TimeOfDay.TotalSeconds != 0;
-                var dateFormat = dateValueContatinsTime ? "yyyy-MM-dd'T'HH:mm:ss" : "yyyy-MM-dd";
+                var dateValueContainsTime = Math.Abs(dateTimeValue.TimeOfDay.TotalSeconds) > 0.00000000001;
+                var dateFormat = dateValueContainsTime ? "yyyy-MM-dd'T'HH:mm:ss" : "yyyy-MM-dd";
 
                 rendererTreeBuilder
                     .OpenElement(HtmlTagNames.Div, "edit-field-wrapper")
                     .OpenElement(HtmlTagNames.Input, "edit-text-field")
-                    .AddAttribute(HtmlAttributes.Type, dateValueContatinsTime ? "datetime-local" : "date")
+                    .AddAttribute(HtmlAttributes.Type, dateValueContainsTime ? "datetime-local" : "date")
                     .AddAttribute(HtmlAttributes.Value, BindConverter.FormatValue(dateTimeValue, dateFormat))
-                    .AddAttribute(HtmlJSEvents.OnChange, EventCallback.Factory.Create(this,
+                    .AddAttribute(HtmlJsEvents.OnChange, EventCallback.Factory.Create(this,
                         (ChangeEventArgs e) =>
                         {
-                            onChangeAction?.Invoke(localColumnName, BindConverterExtensions.ConvertTo(e.Value, DateTime.MinValue));
+                            onChangeAction?.Invoke(columnName, BindConverterExtensions.ConvertTo(e.Value, DateTime.MinValue));
                         }))
                     .CloseElement()
                     .CloseElement();
             }
             else
             {
-                successor.BuildInputRendererTree(rendererTreeBuilder, actualItemContext, onChangeAction);
+                Successor.BuildInputRendererTree(rendererTreeBuilder, actualItemContext, onChangeAction, columnName);
             }
         }
 
-        private bool IsSupportedDateType(object value)
+        private static bool IsSupportedDateType(object value)
             => value is DateTime || value is DateTimeOffset;
 
-        private DateTime ConvertToDateTime(object value)
+        private static DateTime ConvertToDateTime(object value)
         {
             if (value is DateTimeOffset dateTimeOffset)
             {

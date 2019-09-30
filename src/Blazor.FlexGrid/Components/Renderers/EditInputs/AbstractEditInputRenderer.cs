@@ -4,11 +4,11 @@ namespace Blazor.FlexGrid.Components.Renderers.EditInputs
 {
     public abstract class AbstractEditInputRenderer
     {
-        protected AbstractEditInputRenderer successor;
+        protected AbstractEditInputRenderer Successor;
 
         public void SetSuccessor(AbstractEditInputRenderer editInputRenderer)
-            => successor = editInputRenderer ?? throw new ArgumentNullException(nameof(editInputRenderer));
+            => Successor = editInputRenderer ?? throw new ArgumentNullException(nameof(editInputRenderer));
 
-        abstract public void BuildInputRendererTree(IRendererTreeBuilder rendererTreeBuilder, IActualItemContext<object> actualItemContext, Action<string, object> onChangeAction);
+        public abstract void BuildInputRendererTree(IRendererTreeBuilder rendererTreeBuilder, IActualItemContext<object> actualItemContext, Action<string, object> onChangeAction, string columnName);
     }
 }

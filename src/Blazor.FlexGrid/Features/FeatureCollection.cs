@@ -6,7 +6,7 @@ namespace Blazor.FlexGrid.Features
 {
     public class FeatureCollection : IFeatureCollection
     {
-        private Dictionary<Type, IFeature> features;
+        private readonly Dictionary<Type, IFeature> _features;
 
         public IFeature this[Type key]
         {
@@ -17,7 +17,7 @@ namespace Blazor.FlexGrid.Features
                     throw new ArgumentNullException(nameof(key));
                 }
 
-                return features.TryGetValue(key, out var feature)
+                return _features.TryGetValue(key, out var feature)
                     ? feature
                     : NullFeature.Instance;
             }
@@ -30,19 +30,19 @@ namespace Blazor.FlexGrid.Features
 
                 if (value != null)
                 {
-                    features[key] = value;
+                    _features[key] = value;
                 }
             }
         }
 
         public FeatureCollection()
         {
-            features = new Dictionary<Type, IFeature>();
+            _features = new Dictionary<Type, IFeature>();
         }
 
         public FeatureCollection(IEnumerable<IFeature> features)
         {
-            this.features = features.ToDictionary(feature => feature.GetType(), feature => feature);
+            _features = features.ToDictionary(feature => feature.GetType(), feature => feature);
         }
 
         public TFeature Get<TFeature>() where TFeature : IFeature

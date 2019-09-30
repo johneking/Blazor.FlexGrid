@@ -29,7 +29,7 @@ namespace Blazor.FlexGrid.Components
                 return;
             }
 
-            RequestRerenderTableRowsNotification = requestRendererNotification ?? throw new ArgumentNullException(nameof(requestRendererNotification));
+            RequestRerenderTableRowsNotification = requestRendererNotification;
         }
 
         public bool IsFeatureActive<TFeature>() where TFeature : IFeature

@@ -50,7 +50,7 @@ namespace Blazor.FlexGrid.Components
                 .AddContent("Create Item")
                 .CloseElement()
                 .OpenElement(HtmlTagNames.Button, "close")
-                .AddAttribute(HtmlJSEvents.OnClick, EventCallback.Factory.Create(this, (MouseEventArgs e) => FlexGridInterop.HideModal(CreateItemOptions.CreateItemModalName)))
+                .AddAttribute(HtmlJsEvents.OnClick, EventCallback.Factory.Create(this, (MouseEventArgs e) => FlexGridInterop.HideModal(CreateItemOptions.CreateItemModalName)))
                 .AddAttribute(HtmlAttributes.Type, "button")
                 .AddAttribute("data-dismiss", "modal")
                 .AddAttribute("aria-label", "Close")

@@ -51,7 +51,7 @@ namespace Blazor.FlexGrid.Components.Renderers
             rendererContext.OpenElement(HtmlTagNames.Div, rendererContext.CssClasses.FooterCssClasses.GroupingPartWrapper);
             rendererContext.OpenElement(HtmlTagNames.Select, "group-select");
             rendererContext.AddAttribute(HtmlAttributes.Id, GroupingSelectId);
-            rendererContext.AddAttribute(HtmlJSEvents.OnChange,
+            rendererContext.AddAttribute(HtmlJsEvents.OnChange,
                 EventCallback.Factory.Create(this, async (ChangeEventArgs e) =>
                 {
                     rendererContext.TableDataSet.GroupingOptions.SetGroupedProperty(BindConverterExtensions.ConvertTo(e.Value, string.Empty));

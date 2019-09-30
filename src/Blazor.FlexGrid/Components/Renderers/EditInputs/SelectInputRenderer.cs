@@ -5,10 +5,9 @@ namespace Blazor.FlexGrid.Components.Renderers.EditInputs
 {
     public class SelectInputRenderer : AbstractEditInputRenderer
     {
-        public override void BuildInputRendererTree(IRendererTreeBuilder rendererTreeBuilder, IActualItemContext<object> actualItemContext, Action<string, object> onChangeAction)
+        public override void BuildInputRendererTree(IRendererTreeBuilder rendererTreeBuilder, IActualItemContext<object> actualItemContext, Action<string, object> onChangeAction, string columnName)
         {
-            var localColumnName = actualItemContext.ActualColumnName;
-            var value = actualItemContext.GetActualItemColumnValue(localColumnName);
+            var value = actualItemContext.GetActualItemColumnValue(columnName);
             if (value is Enum enumTypeValue)
             {
                 var actualStringValue = enumTypeValue.ToString();
@@ -16,11 +15,11 @@ namespace Blazor.FlexGrid.Components.Renderers.EditInputs
                 rendererTreeBuilder
                     .OpenElement(HtmlTagNames.Div, "edit-field-wrapper")
                     .OpenElement(HtmlTagNames.Select, "edit-text-field")
-                    .AddAttribute(HtmlJSEvents.OnChange, EventCallback.Factory.Create(this,
+                    .AddAttribute(HtmlJsEvents.OnChange, EventCallback.Factory.Create(this,
                         (ChangeEventArgs e) =>
                         {
                             var parsedValue = Enum.Parse(value.GetType(), e.Value.ToString());
-                            onChangeAction?.Invoke(localColumnName, parsedValue);
+                            onChangeAction?.Invoke(columnName, parsedValue);
                         }
                     ));
 
@@ -46,7 +45,7 @@ namespace Blazor.FlexGrid.Components.Renderers.EditInputs
             }
             else
             {
-                successor.BuildInputRendererTree(rendererTreeBuilder, actualItemContext, onChangeAction);
+                Successor.BuildInputRendererTree(rendererTreeBuilder, actualItemContext, onChangeAction, columnName);
             }
         }
     }

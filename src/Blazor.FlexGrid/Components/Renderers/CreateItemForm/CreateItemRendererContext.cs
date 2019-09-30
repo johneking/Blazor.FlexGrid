@@ -4,15 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Blazor.FlexGrid.Components.Configuration.MetaData;
 
 namespace Blazor.FlexGrid.Components.Renderers.CreateItemForm
 {
     public class CreateItemRendererContext<TModel> : IActualItemContext<TModel> where TModel : class
     {
-        private readonly ITypePropertyAccessor typePropertyAccessor;
-
-
-        public string ActualColumnName { get; set; }
+        private readonly ITypePropertyAccessor _typePropertyAccessor;
 
         public TModel ActualItem => ViewModel.Model;
 
@@ -20,25 +18,29 @@ namespace Blazor.FlexGrid.Components.Renderers.CreateItemForm
 
         public CreateFormCssClasses CreateFormCssClasses { get; }
 
+        private readonly Dictionary<string, INewItemAnnotations> _annotationLookup;
         public CreateItemRendererContext(
             ICreateItemFormViewModel<TModel> createItemFormViewModel,
             ITypePropertyAccessorCache typePropertyAccessorCache,
-            CreateFormCssClasses createFormCssClasses)
+            CreateFormCssClasses createFormCssClasses, 
+            IEntityType entityConfiguration)
         {
-            this.typePropertyAccessor = typePropertyAccessorCache?.GetPropertyAccesor(typeof(TModel))
+            _typePropertyAccessor = typePropertyAccessorCache?.GetPropertyAccesor(typeof(TModel))
                 ?? throw new ArgumentNullException(nameof(typePropertyAccessorCache));
 
-            this.ViewModel = createItemFormViewModel ?? throw new ArgumentNullException(nameof(createItemFormViewModel));
-            this.CreateFormCssClasses = createFormCssClasses ?? new DefaultCreateFormCssClasses();
+            ViewModel = createItemFormViewModel ?? throw new ArgumentNullException(nameof(createItemFormViewModel));
+            _annotationLookup = entityConfiguration.GetProperties()
+	            .ToDictionary(p => p.Name, p => (INewItemAnnotations) new NewItemAnnotations(p));
+            CreateFormCssClasses = createFormCssClasses ?? new DefaultCreateFormCssClasses();
         }
 
         public object GetActualItemColumnValue(string columnName)
-            => typePropertyAccessor.GetValue(ViewModel.Model, columnName);
+            => _typePropertyAccessor.GetValue(ViewModel.Model, columnName);
 
         public void SetActualItemColumnValue(string columnName, object value)
-            => typePropertyAccessor.SetValue(ViewModel.Model, columnName, value);
+            => _typePropertyAccessor.SetValue(ViewModel.Model, columnName, value);
 
         public IEnumerable<PropertyInfo> GetModelFields()
-            => typePropertyAccessor.Properties.Where(p => p.CanWrite);
+            => _typePropertyAccessor.Properties.Where(p => p.CanWrite && _annotationLookup.ContainsKey(p.Name) && _annotationLookup[p.Name].IsEditable);
     }
 }

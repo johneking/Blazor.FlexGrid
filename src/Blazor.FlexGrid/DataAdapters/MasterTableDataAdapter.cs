@@ -8,14 +8,14 @@ namespace Blazor.FlexGrid.DataAdapters
 {
     public sealed class MasterTableDataAdapter<TItem> : BaseTableDataAdapter, IMasterTableDataAdapter where TItem : class
     {
-        private readonly ITableDataAdapter mainTableDataAdapter;
-        private readonly IGridConfigurationProvider gridConfigurationProvider;
-        private readonly ITableDataAdapterProvider tableDataAdapterProvider;
-        private readonly List<ITableDataAdapter> detailTableDataAdapters;
+        private readonly ITableDataAdapter _mainTableDataAdapter;
+        private readonly IGridConfigurationProvider _gridConfigurationProvider;
+        private readonly ITableDataAdapterProvider _tableDataAdapterProvider;
+        private readonly List<ITableDataAdapter> _detailTableDataAdapters;
 
         public override Type UnderlyingTypeOfItem => typeof(TItem);
 
-        public IReadOnlyCollection<ITableDataAdapter> DetailTableDataAdapters => detailTableDataAdapters;
+        public IReadOnlyCollection<ITableDataAdapter> DetailTableDataAdapters => _detailTableDataAdapters;
 
         public MasterTableDataAdapter(
             CollectionTableDataAdapter<TItem> mainTableDataAdapter,
@@ -38,10 +38,10 @@ namespace Blazor.FlexGrid.DataAdapters
             ITableDataAdapterProvider tableDataAdapterProvider,
             ITableDataAdapter mainTableDataAdapter)
         {
-            this.mainTableDataAdapter = mainTableDataAdapter ?? throw new ArgumentNullException(nameof(mainTableDataAdapter));
-            this.gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
-            this.tableDataAdapterProvider = tableDataAdapterProvider ?? throw new ArgumentNullException(nameof(tableDataAdapterProvider));
-            this.detailTableDataAdapters = new List<ITableDataAdapter>();
+            _mainTableDataAdapter = mainTableDataAdapter ?? throw new ArgumentNullException(nameof(mainTableDataAdapter));
+            _gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
+            _tableDataAdapterProvider = tableDataAdapterProvider ?? throw new ArgumentNullException(nameof(tableDataAdapterProvider));
+            _detailTableDataAdapters = new List<ITableDataAdapter>();
         }
 
         public void AddDetailTableSet(ITableDataAdapter tableDataAdapter)
@@ -51,23 +51,23 @@ namespace Blazor.FlexGrid.DataAdapters
                 throw new ArgumentNullException(nameof(tableDataAdapter));
             }
 
-            detailTableDataAdapters.Add(tableDataAdapter);
+            _detailTableDataAdapters.Add(tableDataAdapter);
         }
 
         public override ITableDataSet GetTableDataSet(Action<TableDataSetOptions> configureDataSet)
         {
-            var mainTableDataSet = mainTableDataAdapter.GetTableDataSet(configureDataSet);
-            var masterTableDataSet = new MasterDetailTableDataSet<TItem>(mainTableDataSet, gridConfigurationProvider, tableDataAdapterProvider);
+            var mainTableDataSet = _mainTableDataAdapter.GetTableDataSet(configureDataSet);
+            var masterTableDataSet = new MasterDetailTableDataSet<TItem>(mainTableDataSet, _gridConfigurationProvider, _tableDataAdapterProvider);
 
-            detailTableDataAdapters.ForEach(dt => masterTableDataSet.AttachDetailDataSetAdapter(dt));
+            _detailTableDataAdapters.ForEach(dt => masterTableDataSet.AttachDetailDataSetAdapter(dt));
 
             return masterTableDataSet;
         }
 
         public override object Clone()
         {
-            var masterTableAdapter = new MasterTableDataAdapter<TItem>(gridConfigurationProvider, tableDataAdapterProvider, mainTableDataAdapter);
-            detailTableDataAdapters.ForEach(adapter => masterTableAdapter.AddDetailTableSet(adapter));
+            var masterTableAdapter = new MasterTableDataAdapter<TItem>(_gridConfigurationProvider, _tableDataAdapterProvider, _mainTableDataAdapter);
+            _detailTableDataAdapters.ForEach(adapter => masterTableAdapter.AddDetailTableSet(adapter));
 
             return masterTableAdapter;
         }

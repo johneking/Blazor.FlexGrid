@@ -39,21 +39,21 @@ namespace Blazor.FlexGrid
 
             foreach (var resource in resources.Where(r => !r.Contains("awesome")))
             {
-                var colonPosition = resource.LastIndexOf(":");
+                var colonPosition = resource.LastIndexOf(":", StringComparison.Ordinal);
                 var resourceName = resource.Substring(colonPosition + 1, resource.Length - colonPosition - 1);
                 AddResource(flexGridAssembly, destinationFolderPath, resource, resourceName);
             }
 
             foreach (var resource in resources.Where(r => r.Contains("awesome") && r.Contains("css")))
             {
-                var backSlashPosition = resource.LastIndexOf("\\");
+                var backSlashPosition = resource.LastIndexOf("\\", StringComparison.Ordinal);
                 var resourceName = resource.Substring(backSlashPosition + 1, resource.Length - backSlashPosition - 1);
                 AddResource(flexGridAssembly, fontAwesomeCssFolderPath, resource, resourceName);
             }
 
             foreach (var resource in resources.Where(r => r.Contains("awesome") && r.Contains("webfonts")))
             {
-                var backSlashPosition = resource.LastIndexOf("\\");
+                var backSlashPosition = resource.LastIndexOf("\\", StringComparison.Ordinal);
                 var resourceName = resource.Substring(backSlashPosition + 1, resource.Length - backSlashPosition - 1);
                 AddResource(flexGridAssembly, fontAwesomeFontsFolderPath, resource, resourceName);
             }
@@ -74,7 +74,7 @@ namespace Blazor.FlexGrid
                 using (var fileStream = new FileStream(Path.Combine(destinationFolderPath, resourceName), FileMode.OpenOrCreate, FileAccess.Write))
                 {
                     fileStream.SetLength(resourceStream.Length);
-                    var bytesRead = -1;
+                    int bytesRead;
                     var bytes = new byte[bufferSize];
 
                     while ((bytesRead = resourceStream.Read(bytes, 0, bufferSize)) > 0)

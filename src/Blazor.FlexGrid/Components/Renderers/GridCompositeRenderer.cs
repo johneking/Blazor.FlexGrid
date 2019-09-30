@@ -5,15 +5,15 @@ namespace Blazor.FlexGrid.Components.Renderers
 {
     public abstract class GridCompositeRenderer : IGridRendererTreeBuilder
     {
-        protected readonly List<IGridRendererTreeBuilder> gridPartRenderers;
-        protected readonly List<IGridRendererTreeBuilder> gridPartRenderersBefore;
-        protected readonly List<IGridRendererTreeBuilder> gridPartRenderersAfter;
+        protected readonly List<IGridRendererTreeBuilder> GridPartRenderers;
+        protected readonly List<IGridRendererTreeBuilder> GridPartRenderersBefore;
+        protected readonly List<IGridRendererTreeBuilder> GridPartRenderersAfter;
 
-        public GridCompositeRenderer()
+        protected GridCompositeRenderer()
         {
-            this.gridPartRenderers = new List<IGridRendererTreeBuilder>();
-            this.gridPartRenderersBefore = new List<IGridRendererTreeBuilder>();
-            this.gridPartRenderersAfter = new List<IGridRendererTreeBuilder>();
+            GridPartRenderers = new List<IGridRendererTreeBuilder>();
+            GridPartRenderersBefore = new List<IGridRendererTreeBuilder>();
+            GridPartRenderersAfter = new List<IGridRendererTreeBuilder>();
         }
 
         public virtual IGridRendererTreeBuilder AddRenderer(IGridRendererTreeBuilder gridPartRenderer, RendererType rendererPosition = RendererType.InsideTag)
@@ -21,13 +21,13 @@ namespace Blazor.FlexGrid.Components.Renderers
             switch (rendererPosition)
             {
                 case RendererType.AfterTag:
-                    gridPartRenderersAfter.Add(gridPartRenderer);
+                    GridPartRenderersAfter.Add(gridPartRenderer);
                     break;
                 case RendererType.BeforeTag:
-                    gridPartRenderersBefore.Add(gridPartRenderer);
+                    GridPartRenderersBefore.Add(gridPartRenderer);
                     break;
                 case RendererType.InsideTag:
-                    gridPartRenderers.Add(gridPartRenderer);
+                    GridPartRenderers.Add(gridPartRenderer);
                     break;
             }
 

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Blazor.FlexGrid
 {
-    public static class ColletionExtensions
+    public static class CollectionExtensions
     {
         private static readonly GroupingKeyEqualityComparer GroupingKeyEqualityComparer = new GroupingKeyEqualityComparer();
 

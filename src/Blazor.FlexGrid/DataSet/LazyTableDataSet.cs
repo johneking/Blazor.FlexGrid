@@ -17,11 +17,11 @@ namespace Blazor.FlexGrid.DataSet
     /// <typeparam name="TItem"></typeparam>
     public class LazyTableDataSet<TItem> : ILazyTableDataSet, IBaseTableDataSet<TItem> where TItem : class
     {
-        private readonly ILazyDataSetLoader<TItem> lazyDataSetLoader;
-        private readonly ILazyGroupableDataSetLoader<TItem> lazyGroupableDataSetLoader;
-        private readonly ILazyDataSetItemManipulator<TItem> lazyDataSetItemSaver;
-        private HashSet<object> selectedItems;
-        private IReadOnlyCollection<IFilterDefinition> filterDefinitions = new List<IFilterDefinition>();
+        private readonly ILazyDataSetLoader<TItem> _lazyDataSetLoader;
+        private readonly ILazyGroupableDataSetLoader<TItem> _lazyGroupableDataSetLoader;
+        private readonly ILazyDataSetItemManipulator<TItem> _lazyDataSetItemSaver;
+        private readonly HashSet<object> _selectedItems;
+        private IReadOnlyCollection<IFilterDefinition> _filterDefinitions = new List<IFilterDefinition>();
 
         public IPagingOptions PageableOptions { get; set; } = new PageableOptions();
 
@@ -35,7 +35,7 @@ namespace Blazor.FlexGrid.DataSet
 
         public GridViewEvents GridViewEvents { get; set; } = new GridViewEvents();
 
-        public bool FilterIsApplied => filterDefinitions.Any();
+        public bool FilterIsApplied => _filterDefinitions.Any();
 
         /// <summary>
         /// Gets or sets the items for the current page.
@@ -51,10 +51,10 @@ namespace Blazor.FlexGrid.DataSet
             ILazyGroupableDataSetLoader<TItem> lazyGroupableDataSetLoader,
             ILazyDataSetItemManipulator<TItem> lazyDataSetItemSaver)
         {
-            this.lazyDataSetLoader = lazyDataSetLoader ?? throw new ArgumentNullException(nameof(lazyDataSetLoader));
-            this.lazyGroupableDataSetLoader = lazyGroupableDataSetLoader ?? throw new ArgumentNullException(nameof(lazyGroupableDataSetLoader));
-            this.lazyDataSetItemSaver = lazyDataSetItemSaver ?? throw new ArgumentNullException(nameof(lazyDataSetItemSaver));
-            this.selectedItems = new HashSet<object>();
+            _lazyDataSetLoader = lazyDataSetLoader ?? throw new ArgumentNullException(nameof(lazyDataSetLoader));
+            _lazyGroupableDataSetLoader = lazyGroupableDataSetLoader ?? throw new ArgumentNullException(nameof(lazyGroupableDataSetLoader));
+            _lazyDataSetItemSaver = lazyDataSetItemSaver ?? throw new ArgumentNullException(nameof(lazyDataSetItemSaver));
+            _selectedItems = new HashSet<object>();
         }
 
         public async Task GoToPage(int index)
@@ -64,13 +64,13 @@ namespace Blazor.FlexGrid.DataSet
 
             if (!GroupingOptions.IsGroupingActive)
             {
-                var pagedDataResult = await lazyDataSetLoader.GetTablePageData(requestOptions, filterDefinitions);
+                var pagedDataResult = await _lazyDataSetLoader.GetTablePageData(requestOptions, _filterDefinitions);
                 Items = pagedDataResult.Items;
                 PageableOptions.TotalItemsCount = pagedDataResult.TotalCount;
             }
             else
             {
-                var groupedDataResult = await lazyGroupableDataSetLoader.GetGroupedTablePageData(requestOptions, filterDefinitions);
+                var groupedDataResult = await _lazyGroupableDataSetLoader.GetGroupedTablePageData(requestOptions, _filterDefinitions);
                 var newGroupedItems = groupedDataResult.Items.AsQueryable().OfType<GroupItem>().ToList();
                 newGroupedItems.PreserveGroupCollapsing(GroupedItems);
                 GroupedItems = newGroupedItems;
@@ -96,15 +96,15 @@ namespace Blazor.FlexGrid.DataSet
         {
             if (ItemIsSelected(item))
             {
-                selectedItems.Remove(item);
+                _selectedItems.Remove(item);
                 return;
             }
 
-            selectedItems.Add(item);
+            _selectedItems.Add(item);
         }
 
         public bool ItemIsSelected(object item)
-            => selectedItems.Contains(item);
+            => _selectedItems.Contains(item);
 
         public void StartEditItem(object item)
         {
@@ -135,7 +135,7 @@ namespace Blazor.FlexGrid.DataSet
             }
 
             var typedItem = (TItem)RowEditOptions.ItemInEditMode;
-            var saveResult = await lazyDataSetItemSaver.SaveItem(typedItem, LazyLoadingOptions);
+            var saveResult = await _lazyDataSetItemSaver.SaveItem(typedItem, LazyLoadingOptions);
             if (saveResult != null)
             {
                 var itemIndex = Items.IndexOf(typedItem);
@@ -149,19 +149,19 @@ namespace Blazor.FlexGrid.DataSet
 
             RowEditOptions.ItemInEditMode = EmptyDataSetItem.Instance;
 
-            return saveResult != null ? true : false;
+            return saveResult != null;
         }
 
-        public void CancelEditation()
+        public void CancelEdit()
             => RowEditOptions.ItemInEditMode = EmptyDataSetItem.Instance;
 
         public async Task<bool> DeleteItem(object item)
         {
             var typedItem = (TItem)item;
-            var removedItem = await lazyDataSetItemSaver.DeleteItem(typedItem, LazyLoadingOptions);
+            var removedItem = await _lazyDataSetItemSaver.DeleteItem(typedItem, LazyLoadingOptions);
             if (removedItem != null)
             {
-                GridViewEvents.DeleteOperationFinished?.Invoke(new DeleteResultArgs { ItemSuccesfullyDeleted = true, Item = removedItem ?? item });
+                GridViewEvents.DeleteOperationFinished?.Invoke(new DeleteResultArgs { ItemSuccesfullyDeleted = true, Item = removedItem });
                 await GoToPage(PageableOptions.CurrentPage);
             }
             else
@@ -169,12 +169,12 @@ namespace Blazor.FlexGrid.DataSet
                 GridViewEvents.DeleteOperationFinished?.Invoke(new DeleteResultArgs { ItemSuccesfullyDeleted = false, Item = item });
             }
 
-            return removedItem != null ? true : false;
+            return removedItem != null;
         }
 
         public Task ApplyFilters(IReadOnlyCollection<IFilterDefinition> filters)
         {
-            filterDefinitions = filters;
+            _filterDefinitions = filters;
 
             return GoToPage(0);
         }

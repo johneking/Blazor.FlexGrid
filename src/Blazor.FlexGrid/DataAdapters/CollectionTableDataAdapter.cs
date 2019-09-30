@@ -14,7 +14,7 @@ namespace Blazor.FlexGrid.DataAdapters
     /// <typeparam name="TItem"></typeparam>
     public class CollectionTableDataAdapter<TItem> : BaseTableDataAdapter where TItem : class
     {
-        private readonly ICollection<TItem> items;
+        private readonly ICollection<TItem> _items;
 
         public Expression<Func<TItem, bool>> Filter { get; set; } = item => true;
 
@@ -23,7 +23,7 @@ namespace Blazor.FlexGrid.DataAdapters
 
         public CollectionTableDataAdapter(ICollection<TItem> items)
         {
-            this.items = items ?? throw new ArgumentNullException(nameof(items));
+            _items = items ?? throw new ArgumentNullException(nameof(items));
         }
 
         public override ITableDataSet GetTableDataSet(Action<TableDataSetOptions> configureDataSet)
@@ -31,7 +31,7 @@ namespace Blazor.FlexGrid.DataAdapters
             var tableDataSetOptions = new TableDataSetOptions();
             configureDataSet?.Invoke(tableDataSetOptions);
 
-            var tableDataSet = new TableDataSet<TItem>(items.Where(Filter.Compile()).AsQueryable(), new FilterExpressionTreeBuilder<TItem>())
+            var tableDataSet = new TableDataSet<TItem>(_items.Where(Filter.Compile()).AsQueryable(), new FilterExpressionTreeBuilder<TItem>())
             {
                 PageableOptions = tableDataSetOptions.PageableOptions,
                 SortingOptions = tableDataSetOptions.SortingOptions,
@@ -43,6 +43,6 @@ namespace Blazor.FlexGrid.DataAdapters
         }
 
         public override object Clone()
-            => new CollectionTableDataAdapter<TItem>(items);
+            => new CollectionTableDataAdapter<TItem>(_items);
     }
 }

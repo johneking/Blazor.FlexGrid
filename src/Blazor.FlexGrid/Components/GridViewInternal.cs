@@ -11,7 +11,6 @@ using Blazor.FlexGrid.Filters;
 using Blazor.FlexGrid.Permission;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
-using Microsoft.AspNetCore.Components.RenderTree;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,19 +20,19 @@ namespace Blazor.FlexGrid.Components
 {
     public class GridViewInternal : ComponentBase
     {
-        private readonly static ITableDataSet EmptyDataSet = new TableDataSet<EmptyDataSetItem>(
+        private static readonly ITableDataSet EmptyDataSet = new TableDataSet<EmptyDataSetItem>(
             Enumerable.Empty<EmptyDataSetItem>().AsQueryable(), new FilterExpressionTreeBuilder<EmptyDataSetItem>());
 
-        private bool tableDataSetInitialized;
+        private bool _tableDataSetInitialized;
 
-        private FlexGridContext fixedFlexGridContext;
-        private (ImutableGridRendererContext ImutableRendererContext, PermissionContext PermissionContext) gridRenderingContexts;
-        protected IEnumerable<IFeature> features;
-        protected ITableDataSet tableDataSet;
+        private FlexGridContext _fixedFlexGridContext;
+        private (ImmutableGridRendererContext ImutableRendererContext, PermissionContext PermissionContext) _gridRenderingContexts;
+        protected IEnumerable<IFeature> Features;
+        protected ITableDataSet TableDataSet;
 
         [Inject] IGridRendererTreeBuilder GridRendererTreeBuilder { get; set; }
 
-        [Inject] GridContextsFactory RendererContextFactory { get; set; }
+        [Inject] GridContextFactory RendererContextFactory { get; set; }
 
         [Inject] IMasterDetailTableDataSetFactory MasterDetailTableDataSetFactory { get; set; }
 
@@ -60,7 +59,7 @@ namespace Blazor.FlexGrid.Components
 
         protected GridViewInternal(IEnumerable<IFeature> features)
         {
-            this.features = features ?? throw new ArgumentNullException(nameof(features));
+            Features = features ?? throw new ArgumentNullException(nameof(features));
         }
 
         protected override void BuildRenderTree(RenderTreeBuilder builder)
@@ -68,11 +67,11 @@ namespace Blazor.FlexGrid.Components
             base.BuildRenderTree(builder);
             var rendererTreeBuilder = new BlazorRendererTreeBuilder(builder);
 
-            RenderFragment<ImutableGridRendererContext> tableFragment =
-                (ImutableGridRendererContext imutableGridRendererContext) => delegate (RenderTreeBuilder internalBuilder)
+            RenderFragment<ImmutableGridRendererContext> tableFragment =
+                (ImmutableGridRendererContext imutableGridRendererContext) => delegate (RenderTreeBuilder internalBuilder)
             {
-                var gridRendererContext = new GridRendererContext(imutableGridRendererContext, new BlazorRendererTreeBuilder(internalBuilder), tableDataSet, fixedFlexGridContext);
-                GridRendererTreeBuilder.BuildRendererTree(gridRendererContext, gridRenderingContexts.PermissionContext);
+                var gridRendererContext = new GridRendererContext(imutableGridRendererContext, new BlazorRendererTreeBuilder(internalBuilder), TableDataSet, _fixedFlexGridContext);
+                GridRendererTreeBuilder.BuildRendererTree(gridRendererContext, _gridRenderingContexts.PermissionContext);
             };
 
             RenderFragment flexGridFragment = delegate (RenderTreeBuilder interalBuilder)
@@ -80,18 +79,18 @@ namespace Blazor.FlexGrid.Components
                 var internalRendererTreeBuilder = new BlazorRendererTreeBuilder(interalBuilder);
                 internalRendererTreeBuilder
                     .OpenComponent(typeof(GridViewTable))
-                    .AddAttribute(nameof(ImutableGridRendererContext), gridRenderingContexts.ImutableRendererContext)
+                    .AddAttribute(nameof(ImmutableGridRendererContext), _gridRenderingContexts.ImutableRendererContext)
                     .AddAttribute(BlazorRendererTreeBuilder.ChildContent, tableFragment)
                     .CloseComponent();
 
-                if (gridRenderingContexts.ImutableRendererContext.CreateItemIsAllowed() &&
-                    fixedFlexGridContext.IsFeatureActive<CreateItemFeature>())
+                if (_gridRenderingContexts.ImutableRendererContext.CreateItemIsAllowed() &&
+                    _fixedFlexGridContext.IsFeatureActive<CreateItemFeature>())
                 {
                     internalRendererTreeBuilder
                           .OpenComponent(typeof(CreateItemModal))
-                          .AddAttribute(nameof(CreateItemOptions), gridRenderingContexts.ImutableRendererContext.GridConfiguration.CreateItemOptions)
-                          .AddAttribute(nameof(PermissionContext), gridRenderingContexts.PermissionContext)
-                          .AddAttribute(nameof(CreateFormCssClasses), gridRenderingContexts.ImutableRendererContext.CssClasses.CreateFormCssClasses)
+                          .AddAttribute(nameof(CreateItemOptions), _gridRenderingContexts.ImutableRendererContext.GridConfiguration.CreateItemOptions)
+                          .AddAttribute(nameof(PermissionContext), _gridRenderingContexts.PermissionContext)
+                          .AddAttribute(nameof(CreateFormCssClasses), _gridRenderingContexts.ImutableRendererContext.CssClasses.CreateFormCssClasses)
                           .AddAttribute(nameof(NewItemCreated), NewItemCreated)
                           .CloseComponent();
                 }
@@ -100,44 +99,44 @@ namespace Blazor.FlexGrid.Components
             rendererTreeBuilder
                 .OpenComponent(typeof(CascadingValue<FlexGridContext>))
                     .AddAttribute("IsFixed", true)
-                    .AddAttribute("Value", fixedFlexGridContext)
+                    .AddAttribute("Value", _fixedFlexGridContext)
                     .AddAttribute(nameof(BlazorRendererTreeBuilder.ChildContent), flexGridFragment)
                     .CloseComponent();
         }
 
         protected override async Task OnInitializedAsync()
         {
-            fixedFlexGridContext = CreateFlexGridContext();
+            _fixedFlexGridContext = CreateFlexGridContext();
 
             if (DataAdapter != null)
             {
                 ConventionsSet.ApplyConventions(DataAdapter.UnderlyingTypeOfItem);
             }
 
-            tableDataSet = GetTableDataSet();
-            await tableDataSet.GoToPage(0);
+            TableDataSet = GetTableDataSet();
+            await TableDataSet.GoToPage(0);
 
             if (DataAdapter != null)
             {
-                fixedFlexGridContext.FirstPageLoaded = true;
+                _fixedFlexGridContext.FirstPageLoaded = true;
             }
         }
 
         protected override async Task OnParametersSetAsync()
         {
-            if (!tableDataSetInitialized &&
+            if (!_tableDataSetInitialized &&
                 DataAdapter != null)
             {
                 ConventionsSet.ApplyConventions(DataAdapter.UnderlyingTypeOfItem);
-                tableDataSet = GetTableDataSet();
-                await tableDataSet.GoToPage(0);
+                TableDataSet = GetTableDataSet();
+                await TableDataSet.GoToPage(0);
 
-                fixedFlexGridContext.FirstPageLoaded = true;
+                _fixedFlexGridContext.FirstPageLoaded = true;
             }
         }
 
         protected virtual FlexGridContext CreateFlexGridContext()
-            => new FlexGridContext(new FilterContext(), new FeatureCollection(features));
+            => new FlexGridContext(new FilterContext(), new FeatureCollection(Features));
 
         protected ITableDataSet GetTableDataSet()
         {
@@ -161,25 +160,25 @@ namespace Blazor.FlexGrid.Components
             else
             {
                 tableDataSet = MasterDetailTableDataSetFactory.ConvertToMasterTableIfIsRequired(tableDataSet);
-                if (fixedFlexGridContext.IsFeatureActive<FilteringFeature>())
+                if (_fixedFlexGridContext.IsFeatureActive<FilteringFeature>())
                 {
-                    fixedFlexGridContext.FilterContext.OnFilterChanged += FilterChanged;
+                    _fixedFlexGridContext.FilterContext.OnFilterChanged += FilterChanged;
                 }
 
-                tableDataSetInitialized = true;
+                _tableDataSetInitialized = true;
             }
 
-            gridRenderingContexts = RendererContextFactory.CreateContexts(tableDataSet);
-            if (fixedFlexGridContext.IsFeatureActive<GroupingFeature>())
+            _gridRenderingContexts = RendererContextFactory.CreateContexts(tableDataSet);
+            if (_fixedFlexGridContext.IsFeatureActive<GroupingFeature>())
             {
                 tableDataSet.GroupingOptions.SetConfiguration(
-                    gridRenderingContexts.ImutableRendererContext.GridConfiguration.GroupingOptions,
-                    gridRenderingContexts.ImutableRendererContext.GridItemProperties);
+                    _gridRenderingContexts.ImutableRendererContext.GridConfiguration.GroupingOptions,
+                    _gridRenderingContexts.ImutableRendererContext.GridItemProperties);
             }
 
             if (tableDataSet is IMasterTableDataSet)
             {
-                fixedFlexGridContext.Features.Set<IMasterTableFeature>(new MasterTableFeature(DataAdapter));
+                _fixedFlexGridContext.Features.Set<IMasterTableFeature>(new MasterTableFeature(DataAdapter));
             }
 
             return tableDataSet;
@@ -187,8 +186,8 @@ namespace Blazor.FlexGrid.Components
 
         private void FilterChanged(object sender, FilterChangedEventArgs e)
         {
-            tableDataSet.ApplyFilters(e.Filters);
-            fixedFlexGridContext.RequestRerenderTableRowsNotification?.Invoke();
+            TableDataSet.ApplyFilters(e.Filters);
+            _fixedFlexGridContext.RequestRerenderTableRowsNotification?.Invoke();
         }
     }
 }

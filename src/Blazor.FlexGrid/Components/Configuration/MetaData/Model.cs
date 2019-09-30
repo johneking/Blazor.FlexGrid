@@ -5,13 +5,13 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
 {
     public class Model : Annotatable, IModel
     {
-        private readonly SortedDictionary<string, EntityType> entityTypes;
-        private readonly Dictionary<Type, EntityType> entityTypesMap;
+        private readonly SortedDictionary<string, EntityType> _entityTypes;
+        private readonly Dictionary<Type, EntityType> _entityTypesMap;
 
         public Model()
         {
-            this.entityTypes = new SortedDictionary<string, EntityType>();
-            this.entityTypesMap = new Dictionary<Type, EntityType>();
+            _entityTypes = new SortedDictionary<string, EntityType>();
+            _entityTypesMap = new Dictionary<Type, EntityType>();
         }
 
 
@@ -25,23 +25,23 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
 
             var entityType = new EntityType(clrType, this);
 
-            entityTypes.Add(entityType.Name, entityType);
-            entityTypesMap.Add(clrType, entityType);
+            _entityTypes.Add(entityType.Name, entityType);
+            _entityTypesMap.Add(clrType, entityType);
 
             return entityType;
         }
 
         public EntityType FindEntityType(Type clrType)
-            => entityTypesMap.TryGetValue(clrType, out var entityType)
+            => _entityTypesMap.TryGetValue(clrType, out var entityType)
                 ? entityType
                 : null;
 
         public EntityType FindEntityType(string name)
-            => entityTypes.TryGetValue(name, out var entityType)
+            => _entityTypes.TryGetValue(name, out var entityType)
                 ? entityType
                 : null;
 
-        public IEnumerable<EntityType> GetEntityTypes() => entityTypes.Values;
+        public IEnumerable<EntityType> GetEntityTypes() => _entityTypes.Values;
 
 
         IEntityType IModel.AddEntityType(Type clrType) => AddEntityType(clrType);

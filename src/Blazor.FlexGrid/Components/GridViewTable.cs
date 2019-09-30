@@ -1,15 +1,14 @@
 ﻿using Blazor.FlexGrid.Components.Renderers;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
-using Microsoft.AspNetCore.Components.RenderTree;
 
 namespace Blazor.FlexGrid.Components
 {
     internal class GridViewTable : ComponentBase
     {
-        [Parameter] public RenderFragment<ImutableGridRendererContext> ChildContent { get; set; }
+        [Parameter] public RenderFragment<ImmutableGridRendererContext> ChildContent { get; set; }
 
-        [Parameter] public ImutableGridRendererContext ImutableGridRendererContext { get; set; }
+        [Parameter] public ImmutableGridRendererContext ImmutableGridRendererContext { get; set; }
 
         [CascadingParameter] FlexGridContext CascadeFlexGridContext { get; set; }
 
@@ -17,9 +16,9 @@ namespace Blazor.FlexGrid.Components
         {
             base.BuildRenderTree(builder);
 
-            builder.OpenComponent<CascadingValue<ImutableGridRendererContext>>(0);
-            builder.AddAttribute(1, "Value", ImutableGridRendererContext);
-            builder.AddAttribute(2, BlazorRendererTreeBuilder.ChildContent, ChildContent?.Invoke(ImutableGridRendererContext));
+            builder.OpenComponent<CascadingValue<ImmutableGridRendererContext>>(0);
+            builder.AddAttribute(1, "Value", ImmutableGridRendererContext);
+            builder.AddAttribute(2, BlazorRendererTreeBuilder.ChildContent, ChildContent?.Invoke(ImmutableGridRendererContext));
             builder.CloseComponent();
         }
 

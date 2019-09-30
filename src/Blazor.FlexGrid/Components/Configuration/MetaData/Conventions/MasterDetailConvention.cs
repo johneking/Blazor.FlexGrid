@@ -34,16 +34,16 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData.Conventions
 
         private void ConfigureMasterDetailRelationShip(IMasterDetailRelationship masterDetailRelationship, PropertyInfo propertyInfo)
         {
-            var relationShipBuilder = new InternalMasterDetailRelationshipBuilder(masterDetailRelationship as MasterDetailRelationship, internalModelBuilder);
+            var relationShipBuilder = new InternalMasterDetailRelationshipBuilder(masterDetailRelationship as MasterDetailRelationship, InternalModelBuilder);
             var pageSizeAnnotationValue = masterDetailRelationship[GridViewAnnotationNames.DetailTabPageSize];
             var pageCaptionAnnotationValue = masterDetailRelationship[GridViewAnnotationNames.DetailTabPageCaption];
 
-            if (pageSizeAnnotationValue is NullAnotationValue)
+            if (pageSizeAnnotationValue is NullAnnotationValue)
             {
                 relationShipBuilder.HasPageSize(DefaultPageSize);
             }
 
-            if (pageCaptionAnnotationValue is NullAnotationValue)
+            if (pageCaptionAnnotationValue is NullAnnotationValue)
             {
                 relationShipBuilder.HasCaption(propertyInfo.Name);
             }

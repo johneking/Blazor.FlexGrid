@@ -15,18 +15,18 @@ namespace Blazor.FlexGrid.Filters
             }
 
             var param = Expression.Parameter(typeof(TItem), "t");
-            var filterExpressionTree = default(Expression);
+            Expression filterExpressionTree;
 
             if (filters.Count == 1)
             {
-                filterExpressionTree = FilterConverter.ConvertToExpression<TItem>(filters.First(), param);
+                filterExpressionTree = FilterConverter.ConvertToExpression(filters.First(), param);
             }
             else
             {
-                filterExpressionTree = FilterConverter.ConvertToExpression<TItem>(filters.First(), param);
+                filterExpressionTree = FilterConverter.ConvertToExpression(filters.First(), param);
                 foreach (var filter in filters.Skip(1))
                 {
-                    filterExpressionTree = Expression.AndAlso(filterExpressionTree, FilterConverter.ConvertToExpression<TItem>(filter, param));
+                    filterExpressionTree = Expression.AndAlso(filterExpressionTree, FilterConverter.ConvertToExpression(filter, param));
                 }
             }
 

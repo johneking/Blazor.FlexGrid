@@ -1,22 +1,23 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace Blazor.FlexGrid.Components.Renderers.FormInputs
 {
     public class CheckBoxInputBuilder : IFormInputRendererBuilder
     {
-        private readonly EventCallbackFactory eventCallbackFactory;
+        private readonly EventCallbackFactory _eventCallbackFactory;
 
         public CheckBoxInputBuilder()
         {
-            this.eventCallbackFactory = new EventCallbackFactory();
+            _eventCallbackFactory = new EventCallbackFactory();
         }
 
-        public Action<IRendererTreeBuilder> BuildRendererTree<TItem>(IActualItemContext<TItem> actualItemContext, FormField field) where TItem : class
+        public Action<IRendererTreeBuilder> BuildRendererTree<TItem>(IActualItemContext<TItem> actualItemContext, FormField field, string localColumnName) where TItem : class
         {
-            var localColumnName = actualItemContext.ActualColumnName;
             var value = actualItemContext.GetActualItemColumnValue(localColumnName);
 
             var valueExpression = GetValueExpression(actualItemContext.ActualItem, field);
@@ -34,11 +35,11 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
 
                 if (field.IsNullable)
                 {
-                    builder.AddAttribute("ValueChanged", eventCallbackFactory.Create<bool?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)));
+                    builder.AddAttribute("ValueChanged", _eventCallbackFactory.Create<bool?>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)));
                 }
                 else
                 {
-                    builder.AddAttribute("ValueChanged", eventCallbackFactory.Create<bool>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)));
+                    builder.AddAttribute("ValueChanged", _eventCallbackFactory.Create<bool>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)));
                 }
 
                 builder
@@ -62,7 +63,9 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
         }
 
         public bool IsSupportedDateType(Type type)
-            => type == typeof(bool);
+            => SupportedTypes.Contains(type);
+
+		private static readonly Type[] SupportedTypes ={ typeof(bool) };
 
         private LambdaExpression GetValueExpression(object actualItem, FormField field)
         {

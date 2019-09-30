@@ -5,7 +5,7 @@ namespace Blazor.FlexGrid
 {
     public class MeasurableScope : IDisposable
     {
-        private bool disposedValue; // To detect redundant calls
+        private bool _disposedValue; // To detect redundant calls
 
         private readonly Stopwatch _stopwatch;
         private readonly Action<Stopwatch> _measuredResultAction;
@@ -19,7 +19,7 @@ namespace Blazor.FlexGrid
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
@@ -27,7 +27,7 @@ namespace Blazor.FlexGrid
                     _measuredResultAction?.Invoke(_stopwatch);
                 }
 
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 

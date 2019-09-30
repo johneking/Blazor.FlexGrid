@@ -6,8 +6,8 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
 {
     public class EntityType : Annotatable, IEntityType
     {
-        private readonly SortedDictionary<string, Property> properties;
-        private readonly SortedDictionary<string, MasterDetailRelationship> detailRelationships;
+        private readonly SortedDictionary<string, Property> _properties;
+        private readonly SortedDictionary<string, MasterDetailRelationship> _detailRelationships;
 
         public Model Model { get; }
 
@@ -23,22 +23,22 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             Model = model ?? throw new ArgumentNullException(nameof(model));
             ClrType = clrType ?? throw new ArgumentNullException(nameof(clrType));
             Name = clrType.FullName;
-            this.properties = new SortedDictionary<string, Property>();
-            this.detailRelationships = new SortedDictionary<string, MasterDetailRelationship>();
+            _properties = new SortedDictionary<string, Property>();
+            _detailRelationships = new SortedDictionary<string, MasterDetailRelationship>();
             ClrTypeCollectionProperties = GetClrTypeCollectionProperties();
         }
 
         public IProperty FindProperty(string name)
-            => properties.TryGetValue(name, out var property)
+            => _properties.TryGetValue(name, out var property)
                 ? property
                 : null;
 
         public IMasterDetailRelationship FindDetailRelationship(Type detailType)
-            => detailRelationships.TryGetValue(detailType.FullName, out var masterDetailRelationship)
+            => _detailRelationships.TryGetValue(detailType.FullName, out var masterDetailRelationship)
                 ? masterDetailRelationship
                 : null;
 
-        public IEnumerable<IProperty> GetProperties() => properties.Values;
+        public IEnumerable<IProperty> GetProperties() => _properties.Values;
 
         public Property AddProperty(MemberInfo memberInfo)
         {
@@ -50,7 +50,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             ValidationPropertyCanBeAdded(memberInfo.Name);
 
             var property = new Property(memberInfo.Name, memberInfo.GetMemberType(), memberInfo as PropertyInfo, this);
-            properties.Add(memberInfo.Name, property);
+            _properties.Add(memberInfo.Name, property);
 
             return property;
         }
@@ -75,7 +75,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             ValidationDetailRelationshipCanBeAdded(detailType);
 
             var masterDetailRelationship = new MasterDetailRelationship(masterPropertyName, foreignPropertyName);
-            detailRelationships.Add(detailType.FullName, masterDetailRelationship);
+            _detailRelationships.Add(detailType.FullName, masterDetailRelationship);
 
             return masterDetailRelationship;
         }
@@ -90,7 +90,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             ValidationDetailRelationshipCanBeAdded(detailType);
 
             var masterDetailRelationship = new MasterDetailRelationship();
-            detailRelationships.Add(detailType.FullName, masterDetailRelationship);
+            _detailRelationships.Add(detailType.FullName, masterDetailRelationship);
 
             return masterDetailRelationship;
         }
@@ -98,7 +98,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
 
         private void ValidationPropertyCanBeAdded(string propertyName)
         {
-            if (properties.TryGetValue(propertyName, out var property))
+            if (_properties.TryGetValue(propertyName, out var property))
             {
                 throw new InvalidOperationException($"The property {propertyName} cannot be configured on type {property.DeclaringType} " +
                     $"because property with same name is already configured");
@@ -107,7 +107,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
 
         private void ValidationDetailRelationshipCanBeAdded(Type detailType)
         {
-            if (properties.TryGetValue(detailType.FullName, out var detailRelationship))
+            if (_properties.TryGetValue(detailType.FullName, out var detailRelationship))
             {
                 throw new InvalidOperationException($"The detail relationship for {detailType.FullName} cannot be configured on type {ClrType} " +
                     $"because detail relationship for the same type is already configured");

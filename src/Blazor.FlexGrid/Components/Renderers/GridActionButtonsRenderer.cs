@@ -101,7 +101,7 @@ namespace Blazor.FlexGrid.Components.Renderers
             rendererContext.AddOnClickEvent(
                 EventCallback.Factory.Create(this, (MouseEventArgs e) =>
                 {
-                    rendererContext.TableDataSet.CancelEditation();
+                    rendererContext.TableDataSet.CancelEdit();
                     rendererContext.RequestRerenderNotification?.Invoke();
                 })
             );

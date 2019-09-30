@@ -12,28 +12,28 @@ namespace Blazor.FlexGrid.DataSet.Http
         where TModel : class
         where TOutputDto : class
     {
-        private readonly HttpClient httpClient;
-        private readonly ILogger<HttpCreateItemHandler<TModel, TOutputDto>> logger;
+        private readonly HttpClient _httpClient;
+        private readonly ILogger<HttpCreateItemHandler<TModel, TOutputDto>> _logger;
 
         public HttpCreateItemHandler(
             IHttpClientFactory httpClientFactory,
             ILogger<HttpCreateItemHandler<TModel, TOutputDto>> logger)
         {
-            this.httpClient = httpClientFactory?.Create() ?? throw new ArgumentNullException(nameof(httpClientFactory));
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _httpClient = httpClientFactory?.Create() ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<TOutputDto> CreateItem(TModel model, CreateItemOptions createItemOptions, CancellationToken cancellationToken = default)
         {
             try
             {
-                var response = await httpClient.PostJsonAsync<TOutputDto>(createItemOptions.CreateUri, model);
+                var response = await _httpClient.PostJsonAsync<TOutputDto>(createItemOptions.CreateUri, model);
 
                 return response;
             }
             catch (Exception ex)
             {
-                logger.LogError($"Error during creating item for [{createItemOptions.CreateUri}]. Ex: {ex}");
+                _logger.LogError($"Error during creating item for [{createItemOptions.CreateUri}]. Ex: {ex}");
 
                 throw;
             }

@@ -26,7 +26,8 @@
         public const string ColumnValueFormatter = "GridColumnValueFormatter";
         public const string ColumnValueBlazorComponent = "GridColumnValueBlazorComponent";
         public const string ColumnReadPermission = "GridColumnReadPermission";
-        public const string ColumnWrtiePermission = "GridColumnWrtiePermission";
+        public const string ColumnWritePermission = "GridColumnWrtiePermission";
         public const string ColumnEditBlazorComponentBuilder = "GridColumnEditBlazorComponentBuilder";
+       
     }
 }

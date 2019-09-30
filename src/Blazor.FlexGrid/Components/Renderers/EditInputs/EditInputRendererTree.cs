@@ -4,7 +4,7 @@ namespace Blazor.FlexGrid.Components.Renderers.EditInputs
 {
     public class EditInputRendererTree : AbstractEditInputRenderer
     {
-        private AbstractEditInputRenderer rendererTree;
+        private readonly AbstractEditInputRenderer _rendererTree;
 
         public EditInputRendererTree()
         {
@@ -17,10 +17,10 @@ namespace Blazor.FlexGrid.Components.Renderers.EditInputs
             dateTimeInputRenderer.SetSuccessor(selectInputRenderer);
             selectInputRenderer.SetSuccessor(textInputRenderer);
 
-            rendererTree = numberInputRenderer;
+            _rendererTree = numberInputRenderer;
         }
 
-        public override void BuildInputRendererTree(IRendererTreeBuilder rendererTreeBuilder, IActualItemContext<object> actualItemContext, Action<string, object> onChangeAction)
-            => rendererTree.BuildInputRendererTree(rendererTreeBuilder, actualItemContext, onChangeAction);
+        public override void BuildInputRendererTree(IRendererTreeBuilder rendererTreeBuilder, IActualItemContext<object> actualItemContext, Action<string, object> onChangeAction, string columnName)
+            => _rendererTree.BuildInputRendererTree(rendererTreeBuilder, actualItemContext, onChangeAction, columnName);
     }
 }

@@ -6,15 +6,15 @@ namespace Blazor.FlexGrid.Components.Renderers
 {
     public class GridBodyRenderer : GridPartRenderer
     {
-        private readonly IGridRendererTreeBuilder simpleBodyRendererTreeBuilder;
-        private readonly IGridRendererTreeBuilder groupedBodyRendererTreeBuilder;
+        private readonly IGridRendererTreeBuilder _simpleBodyRendererTreeBuilder;
+        private readonly IGridRendererTreeBuilder _groupedBodyRendererTreeBuilder;
 
         public GridBodyRenderer(
             IGridRendererTreeBuilder simpleBodyRendererTreeBuilder,
             IGridRendererTreeBuilder groupedBodyRendererTreeBuilder)
         {
-            this.simpleBodyRendererTreeBuilder = simpleBodyRendererTreeBuilder ?? throw new ArgumentNullException(nameof(simpleBodyRendererTreeBuilder));
-            this.groupedBodyRendererTreeBuilder = groupedBodyRendererTreeBuilder ?? throw new ArgumentNullException(nameof(groupedBodyRendererTreeBuilder));
+            _simpleBodyRendererTreeBuilder = simpleBodyRendererTreeBuilder ?? throw new ArgumentNullException(nameof(simpleBodyRendererTreeBuilder));
+            _groupedBodyRendererTreeBuilder = groupedBodyRendererTreeBuilder ?? throw new ArgumentNullException(nameof(groupedBodyRendererTreeBuilder));
         }
 
         public override bool CanRender(GridRendererContext rendererContext)
@@ -24,11 +24,11 @@ namespace Blazor.FlexGrid.Components.Renderers
         {
             if (rendererContext.TableDataSet.GroupingOptions.IsGroupingActive)
             {
-                groupedBodyRendererTreeBuilder.BuildRendererTree(rendererContext, permissionContext);
+                _groupedBodyRendererTreeBuilder.BuildRendererTree(rendererContext, permissionContext);
             }
             else
             {
-                simpleBodyRendererTreeBuilder.BuildRendererTree(rendererContext, permissionContext);
+                _simpleBodyRendererTreeBuilder.BuildRendererTree(rendererContext, permissionContext);
             }
         }
     }

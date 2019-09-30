@@ -26,7 +26,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
         public static NullAnnotation Instance = new NullAnnotation();
 
         public NullAnnotation()
-            : this("Null", new NullAnotationValue())
+            : this("Null", new NullAnnotationValue())
         {
 
         }
@@ -37,7 +37,7 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
         }
     }
 
-    public class NullAnotationValue
+    public class NullAnnotationValue
     {
     }
 }

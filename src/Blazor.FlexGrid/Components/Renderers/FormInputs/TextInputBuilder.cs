@@ -7,17 +7,16 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
 {
     public class TextInputBuilder : IFormInputRendererBuilder
     {
-        private readonly EventCallbackFactory eventCallbackFactory;
+        private readonly EventCallbackFactory _eventCallbackFactory;
 
         public TextInputBuilder()
         {
-            this.eventCallbackFactory = new EventCallbackFactory();
+            _eventCallbackFactory = new EventCallbackFactory();
         }
 
-        public Action<IRendererTreeBuilder> BuildRendererTree<TItem>(IActualItemContext<TItem> actualItemContext, FormField field) where TItem : class
+        public Action<IRendererTreeBuilder> BuildRendererTree<TItem>(IActualItemContext<TItem> actualItemContext, FormField field, string columnName) where TItem : class
         {
-            var localColumnName = actualItemContext.ActualColumnName;
-            var value = actualItemContext.GetActualItemColumnValue(localColumnName);
+            var value = actualItemContext.GetActualItemColumnValue(columnName);
 
             var valueExpression = Expression.Lambda<Func<string>>(
                  Expression.Property(
@@ -29,11 +28,11 @@ namespace Blazor.FlexGrid.Components.Renderers.FormInputs
                 builder
                     .OpenElement(HtmlTagNames.Div, "form-field-wrapper")
                     .OpenComponent(typeof(InputText))
-                    .AddAttribute("id", $"create-form-{localColumnName}")
+                    .AddAttribute("id", $"create-form-{columnName}")
                     .AddAttribute("class", "edit-text-field")
                     .AddAttribute("Value", value)
                     .AddAttribute("ValueExpression", valueExpression)
-                    .AddAttribute("ValueChanged", eventCallbackFactory.Create<string>(this, v => actualItemContext.SetActualItemColumnValue(localColumnName, v)))
+                    .AddAttribute("ValueChanged", _eventCallbackFactory.Create<string>(this, v => actualItemContext.SetActualItemColumnValue(columnName, v)))
                     .CloseComponent()
                     .AddValidationMessage<string>(valueExpression)
                     .CloseElement();

@@ -44,7 +44,7 @@
         public const string Checkbox = "checkbox";
     }
 
-    public class HtmlJSEvents
+    public class HtmlJsEvents
     {
         public const string OnClick = "onclick";
         public const string OnChange = "onchange";

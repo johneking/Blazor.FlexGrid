@@ -32,7 +32,8 @@ namespace Blazor.FlexGrid.Components.Configuration.Builders
 
         public bool IsFilterable()
             => HasAnnotation(GridViewAnnotationNames.ColumnIsFilterable, true);
-
+        public bool IsEditable(bool isEditable)
+	        => HasAnnotation(NewItemAnnotationNames.FieldIsEditable, isEditable);
         public bool HasOrder(int order)
             => HasAnnotation(GridViewAnnotationNames.ColumnOrder, order);
 
@@ -72,6 +73,6 @@ namespace Blazor.FlexGrid.Components.Configuration.Builders
             => HasAnnotation(GridViewAnnotationNames.ColumnReadPermission, permissionRestrictionFunc);
 
         public bool HasWritePermissionRestriction(Func<ICurrentUserPermission, bool> permissionRestrictionFunc)
-            => HasAnnotation(GridViewAnnotationNames.ColumnWrtiePermission, permissionRestrictionFunc);
+            => HasAnnotation(GridViewAnnotationNames.ColumnWritePermission, permissionRestrictionFunc);
     }
 }

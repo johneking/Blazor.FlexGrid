@@ -26,7 +26,9 @@ namespace Blazor.FlexGrid.Components.Renderers.CreateItemForm.Layouts
                     var rowFields = fields.Skip(i).Take(ColumnsCount);
                     foreach (var field in rowFields)
                     {
-                        BuildFormFieldRendererTree(field, createItemRendererContext, formInputRendererTreeProvider)?.Invoke(builder);
+	                    //var configProperty = entityType.FindProperty(field.Name);
+	                    //if (configProperty == null || configProperty.IsEditable)
+                            BuildFormFieldRendererTree(field, createItemRendererContext, formInputRendererTreeProvider, field.Name)?.Invoke(builder);
                     }
 
                     builder.CloseElement();
@@ -39,7 +41,8 @@ namespace Blazor.FlexGrid.Components.Renderers.CreateItemForm.Layouts
         public override Action<IRendererTreeBuilder> BuildFieldRendererTree(
             PropertyInfo field,
             CreateItemRendererContext<TModel> createItemRendererContext,
-            IFormInputRendererBuilder formInputRendererBuilder)
+            IFormInputRendererBuilder formInputRendererBuilder, 
+            string columnName)
         {
             return builder =>
             {
@@ -49,7 +52,7 @@ namespace Blazor.FlexGrid.Components.Renderers.CreateItemForm.Layouts
                     .AddContent(field.Name)
                     .CloseElement();
 
-                formInputRendererBuilder.BuildRendererTree(createItemRendererContext, new FormField(field))?.Invoke(builder);
+                formInputRendererBuilder.BuildRendererTree(createItemRendererContext, new FormField(field), columnName)?.Invoke(builder);
 
                 builder.CloseElement();
             };

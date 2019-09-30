@@ -2,23 +2,23 @@
 
 namespace Blazor.FlexGrid.Components.Configuration.MetaData
 {
-    public class GridAnotations : IGridViewAnotations
+    public class GridAnnotations : IGridViewAnnotations
     {
-        private readonly IEntityType entityTypeMetadata;
-        private readonly IAnnotatable annotations;
+        private readonly IEntityType _entityTypeMetadata;
+        private readonly IAnnotatable _annotations;
 
 
         public bool IsMasterTable
         {
             get
             {
-                var isMasterAnotation = annotations[GridViewAnnotationNames.IsMasterTable];
-                if (isMasterAnotation is NullAnotationValue)
+                var isMasterAnnotation = _annotations[GridViewAnnotationNames.IsMasterTable];
+                if (isMasterAnnotation is NullAnnotationValue)
                 {
                     return false;
                 }
 
-                return (bool)isMasterAnotation;
+                return (bool)isMasterAnnotation;
             }
         }
 
@@ -27,8 +27,8 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
         {
             get
             {
-                var masterDetailOptions = annotations[GridViewAnnotationNames.MasterDetailOptions];
-                if (masterDetailOptions is NullAnotationValue)
+                var masterDetailOptions = _annotations[GridViewAnnotationNames.MasterDetailOptions];
+                if (masterDetailOptions is NullAnnotationValue)
                 {
                     return NullMasterDetailOptions.Instance;
                 }
@@ -41,8 +41,8 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
         {
             get
             {
-                var cssClasses = annotations[GridViewAnnotationNames.CssClasses];
-                if (cssClasses is NullAnotationValue)
+                var cssClasses = _annotations[GridViewAnnotationNames.CssClasses];
+                if (cssClasses is NullAnnotationValue)
                 {
                     return new DefaultGridCssClasses();
                 }
@@ -55,8 +55,8 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
         {
             get
             {
-                var inlineEditOptions = annotations[GridViewAnnotationNames.InlineEditOptions];
-                if (inlineEditOptions is NullAnotationValue)
+                var inlineEditOptions = _annotations[GridViewAnnotationNames.InlineEditOptions];
+                if (inlineEditOptions is NullAnnotationValue)
                 {
                     return NullInlineEditOptions.Instance;
                 }
@@ -70,8 +70,8 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             get
             {
 
-                var createItemOptions = annotations[GridViewAnnotationNames.CreateItemOptions];
-                if (createItemOptions is NullAnotationValue)
+                var createItemOptions = _annotations[GridViewAnnotationNames.CreateItemOptions];
+                if (createItemOptions is NullAnnotationValue)
                 {
                     return NullCreateItemOptions.Instance;
                 }
@@ -86,8 +86,8 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
         {
             get
             {
-                var onlyShowExplicitProperties = annotations[GridViewAnnotationNames.OnlyShowExplicitProperties];
-                if (onlyShowExplicitProperties is NullAnotationValue)
+                var onlyShowExplicitProperties = _annotations[GridViewAnnotationNames.OnlyShowExplicitProperties];
+                if (onlyShowExplicitProperties is NullAnnotationValue)
                 {
                     return false;
                 }
@@ -100,8 +100,8 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
         {
             get
             {
-                var groupingOptions = annotations[GridViewAnnotationNames.GroupingOptions];
-                if (groupingOptions is NullAnotationValue)
+                var groupingOptions = _annotations[GridViewAnnotationNames.GroupingOptions];
+                if (groupingOptions is NullAnnotationValue)
                 {
                     return NullGlobalGroupingOptions.Instance;
                 }
@@ -114,8 +114,8 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
         {
             get
             {
-                var emptyItemsMessage = annotations[GridViewAnnotationNames.EmptyItemsMessage];
-                if (emptyItemsMessage is NullAnotationValue)
+                var emptyItemsMessage = _annotations[GridViewAnnotationNames.EmptyItemsMessage];
+                if (emptyItemsMessage is NullAnnotationValue)
                 {
                     return "No data to show here ...";
                 }
@@ -124,18 +124,18 @@ namespace Blazor.FlexGrid.Components.Configuration.MetaData
             }
         }
 
-        public GridAnotations(IEntityType entityType)
+        public GridAnnotations(IEntityType entityType)
         {
-            this.entityTypeMetadata = entityType ?? throw new ArgumentNullException(nameof(entityType));
-            annotations = entityType;
+            _entityTypeMetadata = entityType ?? throw new ArgumentNullException(nameof(entityType));
+            _annotations = entityType;
         }
 
         public IMasterDetailRelationship FindRelationshipConfiguration(Type detailType)
         {
-            var masterDetailConnection = entityTypeMetadata.FindDetailRelationship(detailType);
+            var masterDetailConnection = _entityTypeMetadata.FindDetailRelationship(detailType);
             if (masterDetailConnection is null)
             {
-                throw new InvalidOperationException($"If you want to use Master/Detail functionallity, you must configure relationship using method HasDetailRelationship");
+                throw new InvalidOperationException($"If you want to use Master/Detail functionality, you must configure relationship using method HasDetailRelationship");
             }
 
             return masterDetailConnection;

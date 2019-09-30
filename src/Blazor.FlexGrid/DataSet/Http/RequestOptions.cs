@@ -20,10 +20,10 @@ namespace Blazor.FlexGrid.DataSet.Http
             ISortingOptions sortingOptions,
             IGroupingOptions groupingOptions)
         {
-            this.LazyLoadingOptions = lazyLoadingOptions ?? throw new ArgumentNullException(nameof(lazyLoadingOptions));
-            this.PageableOptions = pageableOptions ?? throw new ArgumentNullException(nameof(pageableOptions));
-            this.SortingOptions = sortingOptions ?? throw new ArgumentNullException(nameof(sortingOptions));
-            this.GroupingOptions = groupingOptions ?? throw new ArgumentNullException(nameof(groupingOptions));
+            LazyLoadingOptions = lazyLoadingOptions ?? throw new ArgumentNullException(nameof(lazyLoadingOptions));
+            PageableOptions = pageableOptions ?? throw new ArgumentNullException(nameof(pageableOptions));
+            SortingOptions = sortingOptions ?? throw new ArgumentNullException(nameof(sortingOptions));
+            GroupingOptions = groupingOptions ?? throw new ArgumentNullException(nameof(groupingOptions));
         }
 
         public string BuildUrl()

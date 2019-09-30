@@ -24,7 +24,7 @@ namespace Blazor.FlexGrid
                 throw new ArgumentException($"Expression '{propertyAccessExpression}' refers to a field, not a property.");
 
             if (!propInfo.DeclaringType.GetTypeInfo().IsAssignableFrom(parameterType.GetTypeInfo()))
-                throw new ArgumentException($"Expresion '{propertyAccessExpression}' refers to a property that is not from type '{parameterType}'.");
+                throw new ArgumentException($"Expression '{propertyAccessExpression}' refers to a property that is not from type '{parameterType}'.");
 
             return propInfo;
         }

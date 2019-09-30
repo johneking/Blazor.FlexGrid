@@ -4,26 +4,26 @@ namespace Blazor.FlexGrid.DataSet.Options
 {
     public class RowEditOptions : IRowEditOptions
     {
-        private Dictionary<string, object> updatedValues;
+        private readonly Dictionary<string, object> _updatedValues;
 
         public object ItemInEditMode { get; set; } = EmptyDataSetItem.Instance;
 
-        public IReadOnlyDictionary<string, object> UpdatedValues => updatedValues;
+        public IReadOnlyDictionary<string, object> UpdatedValues => _updatedValues;
 
         public RowEditOptions()
         {
-            this.updatedValues = new Dictionary<string, object>();
+            _updatedValues = new Dictionary<string, object>();
         }
 
         public void AddNewValue(string propertyName, object value)
         {
-            if (updatedValues.ContainsKey(propertyName))
+            if (_updatedValues.ContainsKey(propertyName))
             {
-                updatedValues[propertyName] = value;
+                _updatedValues[propertyName] = value;
             }
             else
             {
-                updatedValues.Add(propertyName, value);
+                _updatedValues.Add(propertyName, value);
             }
         }
     }

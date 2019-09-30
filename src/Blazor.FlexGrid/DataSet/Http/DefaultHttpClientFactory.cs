@@ -5,14 +5,14 @@ namespace Blazor.FlexGrid.DataSet.Http
 {
     public class DefaultHttpClientFactory : IHttpClientFactory
     {
-        private readonly HttpClient httpClient;
+        private readonly HttpClient _httpClient;
 
         public DefaultHttpClientFactory(HttpClient httpClient)
         {
-            this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
         public HttpClient Create()
-            => httpClient;
+            => _httpClient;
     }
 }

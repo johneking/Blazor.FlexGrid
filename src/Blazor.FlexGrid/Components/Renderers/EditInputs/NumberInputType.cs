@@ -5,10 +5,9 @@ namespace Blazor.FlexGrid.Components.Renderers.EditInputs
 {
     public class NumberInputType : AbstractEditInputRenderer
     {
-        public override void BuildInputRendererTree(IRendererTreeBuilder rendererTreeBuilder, IActualItemContext<object> actualItemContext, Action<string, object> onChangeAction)
+        public override void BuildInputRendererTree(IRendererTreeBuilder rendererTreeBuilder, IActualItemContext<object> actualItemContext, Action<string, object> onChangeAction, string columnName)
         {
-            var localColumnName = actualItemContext.ActualColumnName;
-            var value = actualItemContext.GetActualItemColumnValue(localColumnName);
+            var value = actualItemContext.GetActualItemColumnValue(columnName);
             if (IsSupportedNumberType(value))
             {
                 rendererTreeBuilder
@@ -16,7 +15,7 @@ namespace Blazor.FlexGrid.Components.Renderers.EditInputs
                     .OpenElement(HtmlTagNames.Input, "edit-text-field")
                     .AddAttribute(HtmlAttributes.Type, "number");
 
-                TryAddOnChangeHandler(rendererTreeBuilder, onChangeAction, localColumnName, value);
+                TryAddOnChangeHandler(rendererTreeBuilder, onChangeAction, columnName, value);
 
                 rendererTreeBuilder
                     .CloseElement()
@@ -24,7 +23,7 @@ namespace Blazor.FlexGrid.Components.Renderers.EditInputs
             }
             else
             {
-                successor.BuildInputRendererTree(rendererTreeBuilder, actualItemContext, onChangeAction);
+                Successor.BuildInputRendererTree(rendererTreeBuilder, actualItemContext, onChangeAction, columnName);
             }
         }
 
@@ -36,7 +35,7 @@ namespace Blazor.FlexGrid.Components.Renderers.EditInputs
             if (value is int intValue)
             {
                 rendererTreeBuilder.AddAttribute(HtmlAttributes.Value, BindConverter.FormatValue(intValue));
-                rendererTreeBuilder.AddAttribute(HtmlJSEvents.OnChange, EventCallback.Factory.Create(this,
+                rendererTreeBuilder.AddAttribute(HtmlJsEvents.OnChange, EventCallback.Factory.Create(this,
                     (ChangeEventArgs e) => onChangeAction?.Invoke(localColumnName, BindConverterExtensions.ConvertTo(e.Value, 0))));
             }
             else
@@ -50,7 +49,7 @@ namespace Blazor.FlexGrid.Components.Renderers.EditInputs
             if (value is long longValue)
             {
                 rendererTreeBuilder.AddAttribute(HtmlAttributes.Value, BindConverter.FormatValue(longValue));
-                rendererTreeBuilder.AddAttribute(HtmlJSEvents.OnChange, EventCallback.Factory.Create(this,
+                rendererTreeBuilder.AddAttribute(HtmlJsEvents.OnChange, EventCallback.Factory.Create(this,
                     (ChangeEventArgs e) => onChangeAction?.Invoke(localColumnName, BindConverterExtensions.ConvertTo(e.Value, 0L))));
             }
             else
@@ -64,7 +63,7 @@ namespace Blazor.FlexGrid.Components.Renderers.EditInputs
             if (value is decimal decimalValue)
             {
                 rendererTreeBuilder.AddAttribute(HtmlAttributes.Value, BindConverter.FormatValue(decimalValue));
-                rendererTreeBuilder.AddAttribute(HtmlJSEvents.OnChange, EventCallback.Factory.Create(this,
+                rendererTreeBuilder.AddAttribute(HtmlJsEvents.OnChange, EventCallback.Factory.Create(this,
                     (ChangeEventArgs e) => onChangeAction?.Invoke(localColumnName, BindConverterExtensions.ConvertTo(e.Value, 0m))));
             }
             else
@@ -78,7 +77,7 @@ namespace Blazor.FlexGrid.Components.Renderers.EditInputs
             if (value is double doubleValue)
             {
                 rendererTreeBuilder.AddAttribute(HtmlAttributes.Value, BindConverter.FormatValue(doubleValue));
-                rendererTreeBuilder.AddAttribute(HtmlJSEvents.OnChange, EventCallback.Factory.Create(this,
+                rendererTreeBuilder.AddAttribute(HtmlJsEvents.OnChange, EventCallback.Factory.Create(this,
                     (ChangeEventArgs e) => onChangeAction?.Invoke(localColumnName, BindConverterExtensions.ConvertTo(e.Value, 0d))));
             }
         }

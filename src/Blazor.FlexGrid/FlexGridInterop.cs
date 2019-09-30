@@ -6,26 +6,26 @@ namespace Blazor.FlexGrid
 {
     public class FlexGridInterop
     {
-        private readonly IJSRuntime jSRuntime;
+        private readonly IJSRuntime _jSRuntime;
 
         public FlexGridInterop(IJSRuntime jSRuntime)
         {
-            this.jSRuntime = jSRuntime ?? throw new ArgumentNullException(nameof(jSRuntime));
+            _jSRuntime = jSRuntime ?? throw new ArgumentNullException(nameof(jSRuntime));
         }
 
         public ValueTask<bool> ShowModal(string modalName)
         {
-            return jSRuntime.InvokeAsync<bool>("flexGrid.showModal", modalName);
+            return _jSRuntime.InvokeAsync<bool>("flexGrid.showModal", modalName);
         }
 
         public ValueTask<bool> HideModal(string modalName)
         {
-            return jSRuntime.InvokeAsync<bool>("flexGrid.hideModal", modalName);
+            return _jSRuntime.InvokeAsync<bool>("flexGrid.hideModal", modalName);
         }
 
         public ValueTask<bool> AppendCssClass(string elementName, string cssClass)
         {
-            return jSRuntime.InvokeAsync<bool>("flexGrid.appendCssClass", elementName, cssClass);
+            return _jSRuntime.InvokeAsync<bool>("flexGrid.appendCssClass", elementName, cssClass);
         }
 
 

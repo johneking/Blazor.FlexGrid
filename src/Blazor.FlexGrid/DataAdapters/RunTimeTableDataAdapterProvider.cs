@@ -11,18 +11,18 @@ namespace Blazor.FlexGrid.DataAdapters
 {
     public class RunTimeTableDataAdapterProvider : ITableDataAdapterProvider
     {
-        private readonly IGridConfigurationProvider gridConfigurationProvider;
-        private readonly IDetailDataAdapterVisitors detailDataAdapterVisitors;
-        private readonly ITypePropertyAccessorCache propertyValueAccessorCache;
+        private readonly IGridConfigurationProvider _gridConfigurationProvider;
+        private readonly IDetailDataAdapterVisitors _detailDataAdapterVisitors;
+        private readonly ITypePropertyAccessorCache _propertyValueAccessorCache;
 
         public RunTimeTableDataAdapterProvider(
             IGridConfigurationProvider gridConfigurationProvider,
             ITypePropertyAccessorCache propertyValueAccessorCache,
             IDetailDataAdapterVisitors detailDataAdapterVisitors)
         {
-            this.gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
-            this.detailDataAdapterVisitors = detailDataAdapterVisitors ?? throw new ArgumentNullException(nameof(detailDataAdapterVisitors));
-            this.propertyValueAccessorCache = propertyValueAccessorCache ?? throw new ArgumentNullException(nameof(propertyValueAccessorCache));
+            _gridConfigurationProvider = gridConfigurationProvider ?? throw new ArgumentNullException(nameof(gridConfigurationProvider));
+            _detailDataAdapterVisitors = detailDataAdapterVisitors ?? throw new ArgumentNullException(nameof(detailDataAdapterVisitors));
+            _propertyValueAccessorCache = propertyValueAccessorCache ?? throw new ArgumentNullException(nameof(propertyValueAccessorCache));
         }
 
         public ITableDataAdapter ConvertToDetailTableDataAdapter(ITableDataAdapter tableDataAdapter, object selectedItem)
@@ -30,13 +30,13 @@ namespace Blazor.FlexGrid.DataAdapters
             var detailAdapterType = typeof(DetailTableDataAdapter<>).MakeGenericType(tableDataAdapter.UnderlyingTypeOfItem);
 
             return Activator.CreateInstance(detailAdapterType,
-                new object[] { gridConfigurationProvider, detailDataAdapterVisitors, new MasterDetailRowArguments(tableDataAdapter, selectedItem) }) as ITableDataAdapter;
+                new object[] { _gridConfigurationProvider, _detailDataAdapterVisitors, new MasterDetailRowArguments(tableDataAdapter, selectedItem) }) as ITableDataAdapter;
         }
 
         public ITableDataAdapter CreateCollectionTableDataAdapter(object selectedItem, PropertyInfo propertyInfo)
         {
             var propertyType = propertyInfo.PropertyType.GenericTypeArguments[0];
-            var propertyValueGetter = propertyValueAccessorCache.GetPropertyAccesor(selectedItem.GetType());
+            var propertyValueGetter = _propertyValueAccessorCache.GetPropertyAccesor(selectedItem.GetType());
             var collectionValue = propertyValueGetter.GetValue(selectedItem, propertyInfo.Name);
 
             var dataAdapterType = typeof(CollectionTableDataAdapter<>).MakeGenericType(propertyType);
@@ -58,7 +58,7 @@ namespace Blazor.FlexGrid.DataAdapters
 
         public ITableDataAdapter CreateMasterTableDataAdapter(ITableDataAdapter mainTableDataAdapter, IMasterTableFeature masterTableFeature)
         {
-            if (masterTableFeature == default)
+            if (masterTableFeature == default(IMasterTableFeature))
             {
                 return mainTableDataAdapter;
             }
@@ -67,7 +67,7 @@ namespace Blazor.FlexGrid.DataAdapters
             {
                 var masterDataAdapterType = typeof(MasterTableDataAdapter<>).MakeGenericType(mainTableDataAdapter.UnderlyingTypeOfItem);
                 var masterDataAdapter = Activator.CreateInstance(masterDataAdapterType,
-                    new object[] { mainTableDataAdapter, gridConfigurationProvider, this }) as IMasterTableDataAdapter;
+                    new object[] { mainTableDataAdapter, _gridConfigurationProvider, this }) as IMasterTableDataAdapter;
 
                 foreach (var detailAdapter in masterTableDataAdapter.DetailTableDataAdapters)
                 {
